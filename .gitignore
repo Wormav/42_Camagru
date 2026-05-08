@@ -1,0 +1,19 @@
+# Claude Code
+.claude/
+
+# Environment
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+
+# Node (Tailwind build)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
