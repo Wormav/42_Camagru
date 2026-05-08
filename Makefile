@@ -1,8 +1,3 @@
-# =============================================================================
-# Camagru — Makefile (42 norm style, adapted for a Docker web stack)
-# Mandatory rules: all, clean, fclean, re
-# =============================================================================
-
 NAME    := camagru
 COMPOSE := docker compose
 SERVICE := db
