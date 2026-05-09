@@ -59,7 +59,6 @@ yarn.lock
 # PHP
 # ===========================
 vendor/
-composer.lock
 *.cache
 *.log
 
