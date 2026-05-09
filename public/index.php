@@ -2,10 +2,22 @@
 
 declare(strict_types=1);
 
+// Let PHP's built-in dev server serve static files directly (CSS, images, JS).
+// In production (Nginx), this is handled by `try_files` and never reached.
+if (PHP_SAPI === "cli-server") {
+	$path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+	if ($path !== "/" && $path !== false && is_file(__DIR__ . $path)) {
+		return false;
+	}
+}
+
 require __DIR__ . "/../vendor/autoload.php";
 
 use App\Controller\HomeController;
+use App\Core\Env;
 use App\Core\Router;
+
+Env::load(__DIR__ . "/../.env");
 
 $router = new Router();
 
