@@ -2,12 +2,11 @@
 	"name": "42_camagru_v2",
 	"version": "1.0.0",
 	"description": "A web-based photobooth application built as a 42 school project (subject v4.1).",
-	"main": "index.js",
 	"private": true,
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build:css": "tailwindcss -i assets/input.css -o public/style.css --minify",
-		"watch:css": "tailwindcss -i assets/input.css -o public/style.css --watch "
+		"watch:css": "tailwindcss -i assets/input.css -o public/style.css --watch"
 	},
 	"repository": {
 		"type": "git",
