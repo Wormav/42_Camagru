@@ -1,3 +1,11 @@
+<?php
+/**
+ * Variables exposed by App\View\View::render().
+ *
+ * @var \Closure(mixed): string $e      Escape helper for outputting variables.
+ * @var string|null             $title  Page title shown in the <title> tag.
+ */
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>

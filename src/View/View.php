@@ -21,7 +21,7 @@ class View
 		}
 
 		// for not xss injection
-		$e = static fn(mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
+		$e = static fn (mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 
 		extract($data, EXTR_SKIP);
 		require $templatePath;

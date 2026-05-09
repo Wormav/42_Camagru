@@ -1,4 +1,10 @@
-<?php require __DIR__ . "/_header.php"; ?>
+<?php
+/**
+ * @var \Closure(mixed): string $e      Escape helper.
+ * @var string                  $title  Page title.
+ */
+require __DIR__ . "/_header.php";
+?>
 
 <section class="text-center py-12 sm:py-20">
 	<h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">
