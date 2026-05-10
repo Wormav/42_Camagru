@@ -202,4 +202,169 @@ class AuthController
 			"old"    => $old,
 		]);
 	}
+
+	public function showForgotPassword(): void
+	{
+		Auth::requireGuest();
+		$this->renderForgotPassword([], []);
+	}
+
+	public function forgotPassword(): void
+	{
+		Auth::requireGuest();
+
+		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
+			? $_POST[Csrf::fieldName()]
+			: "";
+		if (!Csrf::validate($submittedToken)) {
+			http_response_code(403);
+			echo "Forbidden";
+			return;
+		}
+
+		$email = is_string($_POST["email"] ?? null) ? trim($_POST["email"]) : "";
+		$old   = ["email" => $email];
+
+		$error = Validator::validateEmail($email);
+		if ($error !== null) {
+			$this->renderForgotPassword([$error], $old);
+			return;
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+		$users    = new User($pdo);
+
+		$user = $users->findByEmail($email);
+		if ($user !== null && (int) $user["is_verified"] === 1) {
+			$token     = bin2hex(random_bytes(32));
+			$expiresAt = (new \DateTimeImmutable("+1 hour"))->format("Y-m-d H:i:s");
+
+			$mailConfig = require __DIR__ . "/../../config/mail.php";
+			$mailer     = new Mailer($mailConfig);
+
+			try {
+				$users->setResetToken((int) $user["id"], $token, $expiresAt);
+				$mailer->sendPasswordReset($email, $user["username"], $token);
+			} catch (Throwable $error) {
+				error_log("Password reset email failed for {$email}: " . $error->getMessage());
+			}
+		}
+
+		header("Location: /reset/sent");
+		exit;
+	}
+
+	public function showForgotPasswordSent(): void
+	{
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("auth/forgot_sent", [
+			"title" => "Check your inbox",
+		]);
+	}
+
+	public function showResetPassword(): void
+	{
+		Auth::requireGuest();
+
+		$token = is_string($_GET["token"] ?? null) ? trim($_GET["token"]) : "";
+
+		$looksValid = $token !== ""
+			&& strlen($token) === 64
+			&& ctype_xdigit($token);
+
+		if (!$looksValid) {
+			$this->renderResetInvalid();
+			return;
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+		$users    = new User($pdo);
+
+		if ($users->findByValidResetToken($token) === null) {
+			$this->renderResetInvalid();
+			return;
+		}
+
+		$this->renderResetForm($token, [], []);
+	}
+
+	public function resetPassword(): void
+	{
+		Auth::requireGuest();
+
+		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
+			? $_POST[Csrf::fieldName()]
+			: "";
+		if (!Csrf::validate($submittedToken)) {
+			http_response_code(403);
+			echo "Forbidden";
+			return;
+		}
+
+		$token                = is_string($_POST["token"] ?? null) ? trim($_POST["token"]) : "";
+		$password             = is_string($_POST["password"] ?? null) ? $_POST["password"] : "";
+		$passwordConfirmation = is_string($_POST["password_confirmation"] ?? null) ? $_POST["password_confirmation"] : "";
+
+		$looksValid = $token !== ""
+			&& strlen($token) === 64
+			&& ctype_xdigit($token);
+
+		if (!$looksValid) {
+			$this->renderResetInvalid();
+			return;
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+		$users    = new User($pdo);
+
+		$user = $users->findByValidResetToken($token);
+		if ($user === null) {
+			$this->renderResetInvalid();
+			return;
+		}
+
+		$errors = Validator::validatePasswordReset($password, $passwordConfirmation);
+		if (!empty($errors)) {
+			$this->renderResetForm($token, $errors, []);
+			return;
+		}
+
+		$passwordHash = password_hash($password, PASSWORD_BCRYPT);
+		$users->updatePasswordAndClearReset((int) $user["id"], $passwordHash);
+
+		header("Location: /login");
+		exit;
+	}
+
+	private function renderForgotPassword(array $errors, array $old): void
+	{
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("auth/forgot", [
+			"title"  => "Reset your password",
+			"errors" => $errors,
+			"old"    => $old,
+		]);
+	}
+
+	private function renderResetForm(string $token, array $errors, array $old): void
+	{
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("auth/reset", [
+			"title"  => "Choose a new password",
+			"token"  => $token,
+			"errors" => $errors,
+			"old"    => $old,
+		]);
+	}
+
+	private function renderResetInvalid(): void
+	{
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("auth/reset_invalid", [
+			"title" => "Reset link invalid",
+		]);
+	}
 }
