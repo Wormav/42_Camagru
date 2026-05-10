@@ -11,7 +11,7 @@
 	<span class="brutal-tag bg-cyan mx-auto">★ Almost there</span>
 
 	<h1 class="font-display font-black text-display-lg mt-5 leading-[0.95]">
-		Check your <span class="highlight highlight--cyan">inbox</span>.
+		Check your <span class="highlight highlight--cyan">inbox</span>
 	</h1>
 
 	<p class="mt-6 text-base font-medium max-w-md mx-auto leading-relaxed">
