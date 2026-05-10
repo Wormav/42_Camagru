@@ -12,9 +12,6 @@ class User
 	{
 	}
 
-	/**
-	 * @return array<string, mixed>|null
-	 */
 	public function findByEmail(string $email): ?array
 	{
 		$stmt = $this->pdo->prepare(
@@ -25,9 +22,6 @@ class User
 		return $row !== false ? $row : null;
 	}
 
-	/**
-	 * @return array<string, mixed>|null
-	 */
 	public function findByUsername(string $username): ?array
 	{
 		$stmt = $this->pdo->prepare(
@@ -38,12 +32,6 @@ class User
 		return $row !== false ? $row : null;
 	}
 
-	/**
-	 * Insert a new user. Returns the generated id.
-	 *
-	 * The caller MUST hash the password (bcrypt) and provide a one-time
-	 * verification token; this method does no security work of its own.
-	 */
 	public function create(
 		string $email,
 		string $username,
@@ -63,10 +51,6 @@ class User
 		return (int) $this->pdo->lastInsertId();
 	}
 
-	/**
-	 * Activate a user account using its verification token. Returns true
-	 * if a row was flipped, false otherwise (token unknown or already used).
-	 */
 	public function verifyByToken(string $token): bool
 	{
 		$stmt = $this->pdo->prepare(

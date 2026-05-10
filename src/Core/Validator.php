@@ -6,9 +6,6 @@ namespace App\Core;
 
 class Validator
 {
-	/**
-	 * Returns an error message if invalid, null if valid.
-	 */
 	public static function validateEmail(string $email): ?string
 	{
 		if ($email === "") {
@@ -38,11 +35,6 @@ class Validator
 		return null;
 	}
 
-	/**
-	 * Subject v4.1: 8+ chars with at least one uppercase, lowercase,
-	 * digit and special character. Each rule yields its own message
-	 * for clearer client-side feedback.
-	 */
 	public static function validatePassword(string $password): ?string
 	{
 		if (strlen($password) < 8) {
@@ -71,11 +63,6 @@ class Validator
 		return null;
 	}
 
-	/**
-	 * Run every rule, return all errors in submission order.
-	 *
-	 * @return list<string>
-	 */
 	public static function validateRegistration(
 		string $email,
 		string $username,
