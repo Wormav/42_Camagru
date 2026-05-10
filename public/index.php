@@ -16,8 +16,10 @@ require __DIR__ . "/../vendor/autoload.php";
 use App\Controller\HomeController;
 use App\Core\Env;
 use App\Core\Router;
+use App\Core\Session;
 
 Env::load(__DIR__ . "/../.env");
+Session::start();
 
 $router = new Router();
 
