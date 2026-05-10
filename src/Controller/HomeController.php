@@ -12,7 +12,7 @@ class HomeController
 	{
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("home", [
-			"title" => "Bienvenue sur Camagru",
+			"title" => "Home",
 		]);
 	}
 }
