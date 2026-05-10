@@ -91,6 +91,29 @@ class AuthController
 		]);
 	}
 
+	public function verify(): void
+	{
+		$token = is_string($_GET["token"] ?? null) ? trim($_GET["token"]) : "";
+
+		$looksValid = $token !== ""
+			&& strlen($token) === 64
+			&& ctype_xdigit($token);
+
+		$success = false;
+		if ($looksValid) {
+			$dbConfig = require __DIR__ . "/../../config/database.php";
+			$pdo      = (new Database($dbConfig))->connection();
+			$users    = new User($pdo);
+			$success  = $users->verifyByToken($token);
+		}
+
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("auth/verify", [
+			"title"   => $success ? "Account verified" : "Verification failed",
+			"success" => $success,
+		]);
+	}
+
 	private function renderRegister(array $errors, array $old): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
