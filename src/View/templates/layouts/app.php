@@ -124,7 +124,7 @@ $navItems = [
 	<div class="border-t-3 border-paper/20">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono uppercase text-paper/60">
 			<p>© <?= date("Y") ?> Camagru — All rights reserved</p>
-			<p>v4.1 · 42 Paris</p>
+			<p>42 Angouleme</p>
 		</div>
 	</div>
 </footer>
