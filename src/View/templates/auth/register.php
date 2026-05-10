@@ -16,7 +16,7 @@ use App\Core\Csrf;
 	<header class="mb-8">
 		<span class="brutal-tag bg-lime">★ New here</span>
 		<h1 class="font-display font-black text-display-lg mt-4 leading-[0.95]">
-			Create your <span class="highlight highlight--pink">account</span>.
+			Create your <span class="highlight highlight--pink">account</span>
 		</h1>
 		<p class="mt-4 text-sm font-mono">
 			// Already have one?

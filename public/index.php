@@ -26,5 +26,7 @@ $router = new Router();
 
 $router->get("/", [HomeController::class, "index"]);
 $router->get("/register", [AuthController::class, "showRegister"]);
+$router->post("/register", [AuthController::class, "register"]);
+$router->get("/register/check-email", [AuthController::class, "showCheckEmail"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);
