@@ -32,5 +32,10 @@ $router->get("/verify", [AuthController::class, "verify"]);
 $router->get("/login", [AuthController::class, "showLogin"]);
 $router->post("/login", [AuthController::class, "login"]);
 $router->post("/logout", [AuthController::class, "logout"]);
+$router->get("/reset", [AuthController::class, "showForgotPassword"]);
+$router->post("/reset", [AuthController::class, "forgotPassword"]);
+$router->get("/reset/sent", [AuthController::class, "showForgotPasswordSent"]);
+$router->get("/reset/confirm", [AuthController::class, "showResetPassword"]);
+$router->post("/reset/confirm", [AuthController::class, "resetPassword"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);

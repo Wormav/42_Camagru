@@ -61,4 +61,48 @@ class User
 		$stmt->execute([":token" => $token]);
 		return $stmt->rowCount() === 1;
 	}
+
+	public function setResetToken(int $userId, string $token, string $expiresAt): void
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users
+			 SET reset_token = :token, reset_token_expires = :expires
+			 WHERE id = :id",
+		);
+		$stmt->execute([
+			":token"   => $token,
+			":expires" => $expiresAt,
+			":id"      => $userId,
+		]);
+	}
+
+	public function findByValidResetToken(string $token): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			"SELECT * FROM users
+			 WHERE reset_token = :token
+			   AND reset_token_expires IS NOT NULL
+			   AND reset_token_expires > NOW()
+			 LIMIT 1",
+		);
+		$stmt->execute([":token" => $token]);
+		$row = $stmt->fetch();
+		return $row !== false ? $row : null;
+	}
+
+	public function updatePasswordAndClearReset(int $userId, string $passwordHash): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users
+			 SET password = :password,
+			     reset_token = NULL,
+			     reset_token_expires = NULL
+			 WHERE id = :id",
+		);
+		$stmt->execute([
+			":password" => $passwordHash,
+			":id"       => $userId,
+		]);
+		return $stmt->rowCount() === 1;
+	}
 }

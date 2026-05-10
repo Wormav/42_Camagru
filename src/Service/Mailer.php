@@ -29,7 +29,7 @@ class Mailer
 
 	public function sendPasswordReset(string $email, string $username, string $token): bool
 	{
-		$link    = $this->buildUrl("/reset", ["token" => $token]);
+		$link    = $this->buildUrl("/reset/confirm", ["token" => $token]);
 		$subject = "Reset your Camagru password";
 
 		$body  = "Hello {$username},\n\n";

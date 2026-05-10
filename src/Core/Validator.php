@@ -63,6 +63,20 @@ class Validator
 		return null;
 	}
 
+	public static function validatePasswordReset(
+		string $password,
+		string $passwordConfirmation,
+	): array {
+		$errors = [];
+		if ($error = self::validatePassword($password)) {
+			$errors[] = $error;
+		}
+		if ($error = self::validatePasswordConfirmation($password, $passwordConfirmation)) {
+			$errors[] = $error;
+		}
+		return $errors;
+	}
+
 	public static function validateRegistration(
 		string $email,
 		string $username,
