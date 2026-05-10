@@ -116,7 +116,6 @@
 		box-shadow: 9px 9px 0 0 theme("colors.ink");
 	}
 
-	/* Tag/pill — small bordered chip. */
 	.brutal-tag {
 		display: inline-flex;
 		align-items: center;
@@ -131,7 +130,6 @@
 		letter-spacing: 0.05em;
 	}
 
-	/* Highlighted text — color block behind a phrase. */
 	.highlight {
 		display: inline-block;
 		padding: 0 0.3em;
@@ -161,5 +159,62 @@
 		font-size: 0.85rem;
 		text-transform: uppercase;
 		letter-spacing: 0.02em;
+	}
+
+	.brutal-label {
+		display: block;
+		font-family: theme("fontFamily.display");
+		font-weight: 800;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		margin-bottom: 0.5rem;
+	}
+
+	.brutal-input {
+		display: block;
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border: 3px solid theme("colors.ink");
+		background: #ffffff;
+		font-family: theme("fontFamily.sans");
+		font-size: 1rem;
+		color: theme("colors.ink");
+		transition:
+			transform 0.12s ease,
+			box-shadow 0.12s ease;
+	}
+	.brutal-input:focus {
+		outline: none;
+		transform: translate(-2px, -2px);
+		box-shadow: theme("boxShadow.brutal-sm");
+	}
+	.brutal-input::placeholder {
+		color: theme("colors.ink");
+		opacity: 0.4;
+	}
+
+	.brutal-help {
+		display: block;
+		margin-top: 0.4rem;
+		font-family: theme("fontFamily.mono");
+		font-size: 0.72rem;
+		color: theme("colors.ink");
+		opacity: 0.65;
+	}
+
+	.brutal-error {
+		border: 3px solid theme("colors.ink");
+		background: theme("colors.coral");
+		box-shadow: theme("boxShadow.brutal-sm");
+		padding: 0.85rem 1rem;
+		font-weight: 700;
+		font-size: 0.9rem;
+	}
+	.brutal-error ul {
+		margin-top: 0.4rem;
+		padding-left: 1.25rem;
+		font-weight: 500;
+		font-size: 0.85rem;
 	}
 }
