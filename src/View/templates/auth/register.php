@@ -41,7 +41,7 @@ use App\Core\Csrf;
 			</div>
 		<?php endif; ?>
 
-		<form method="POST" action="/register" novalidate class="space-y-5">
+		<form id="register-form" method="POST" action="/register" novalidate class="space-y-5">
 			<?= Csrf::field() ?>
 
 			<div>
@@ -114,3 +114,5 @@ use App\Core\Csrf;
 		// By signing up you agree to receive a verification email.
 	</p>
 </section>
+
+<script src="/js/register.js" defer></script>
