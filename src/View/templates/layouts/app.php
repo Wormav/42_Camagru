@@ -7,10 +7,16 @@
  * @var string|null             $title    Optional page title.
  */
 
+use App\Core\Auth;
+use App\Core\Csrf;
+
 $navItems = [
 	["label" => "Gallery", "href" => "/gallery"],
 	["label" => "Edit",    "href" => "/edit"],
 ];
+
+$isAuth   = Auth::check();
+$username = Auth::username();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,11 +32,11 @@ $navItems = [
 <body class="min-h-screen flex flex-col">
 
 <!-- Top navigation -->
-<header class="relative z-10 border-b-3 border-ink bg-paper">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-6">
+<header class="relative z-20 border-b-3 border-ink bg-paper">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
 
 		<!-- Brand -->
-		<a href="/" class="flex items-center gap-3 group">
+		<a href="/" class="flex items-center gap-3 group shrink-0">
 			<span class="tile bg-lime group-hover:bg-pink transition-colors">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" aria-hidden="true">
 					<rect x="3" y="6" width="18" height="13" rx="0"/>
@@ -41,7 +47,7 @@ $navItems = [
 			<span class="font-display font-black text-2xl sm:text-3xl tracking-tight">Camagru</span>
 		</a>
 
-		<!-- Center nav -->
+		<!-- Desktop center nav -->
 		<nav class="hidden md:flex items-center gap-2">
 			<?php foreach ($navItems as $item): ?>
 				<a href="<?= $e($item["href"]) ?>" class="px-3 py-1.5 font-display font-bold text-sm uppercase border-3 border-transparent hover:border-ink hover:bg-cyan transition-all">
@@ -50,15 +56,64 @@ $navItems = [
 			<?php endforeach; ?>
 		</nav>
 
-		<!-- Right actions -->
-		<div class="flex items-center gap-3">
-			<a href="/login" class="hidden sm:inline-block font-display font-bold text-sm uppercase underline decoration-3 underline-offset-4 hover:bg-lime px-2 py-1 transition-colors">
-				Sign in
-			</a>
-			<a href="/register" class="btn-brutal !py-2 !px-3 text-sm">
-				Sign up →
-			</a>
+		<!-- Desktop right actions -->
+		<div class="hidden md:flex items-center gap-3">
+			<?php if ($isAuth): ?>
+				<span class="font-mono text-xs uppercase opacity-70">// <?= $e($username) ?></span>
+				<form method="POST" action="/logout" class="inline-block">
+					<?= Csrf::field() ?>
+					<button type="submit" class="btn-brutal btn-brutal--coral !py-2 !px-3 text-sm">
+						Sign out
+					</button>
+				</form>
+			<?php else: ?>
+				<a href="/login" class="btn-brutal btn-brutal--cyan !py-2 !px-3 text-sm">
+					Sign in
+				</a>
+				<a href="/register" class="btn-brutal !py-2 !px-3 text-sm">
+					Sign up →
+				</a>
+			<?php endif; ?>
 		</div>
+
+		<!-- Mobile burger toggle (pure CSS via <details>) -->
+		<details class="md:hidden">
+			<summary class="list-none cursor-pointer tile bg-paper border-3 border-ink shadow-brutal-sm hover:bg-lime transition-colors" aria-label="Open menu">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" aria-hidden="true">
+					<line x1="4" y1="7"  x2="20" y2="7"/>
+					<line x1="4" y1="12" x2="20" y2="12"/>
+					<line x1="4" y1="17" x2="20" y2="17"/>
+				</svg>
+			</summary>
+
+			<!-- Full-bleed mobile drawer -->
+			<div class="fixed inset-x-0 top-[5rem] bg-paper border-b-3 border-ink shadow-brutal-sm px-4 sm:px-6 py-5 flex flex-col gap-2 z-30">
+				<?php foreach ($navItems as $item): ?>
+					<a href="<?= $e($item["href"]) ?>" class="block px-3 py-2 font-display font-bold text-sm uppercase border-3 border-ink hover:bg-cyan transition-colors">
+						<?= $e($item["label"]) ?>
+					</a>
+				<?php endforeach; ?>
+
+				<hr class="border-t-3 border-ink my-2">
+
+				<?php if ($isAuth): ?>
+					<p class="font-mono text-xs uppercase opacity-70 px-1">// signed in as <?= $e($username) ?></p>
+					<form method="POST" action="/logout">
+						<?= Csrf::field() ?>
+						<button type="submit" class="btn-brutal btn-brutal--coral w-full !py-2 text-sm">
+							Sign out
+						</button>
+					</form>
+				<?php else: ?>
+					<a href="/login" class="btn-brutal btn-brutal--cyan w-full !py-2 text-sm text-center">
+						Sign in
+					</a>
+					<a href="/register" class="btn-brutal w-full !py-2 text-sm text-center">
+						Sign up →
+					</a>
+				<?php endif; ?>
+			</div>
+		</details>
 	</div>
 </header>
 
@@ -67,7 +122,7 @@ $navItems = [
 	<?= $content ?>
 </main>
 
-<!-- Footer — soft-dark brutalist block, four-column meta. -->
+<!-- Footer -->
 <footer class="relative z-10 border-t-3 border-ink bg-dark text-paper mt-24">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 md:grid-cols-12 gap-8">
 
@@ -94,7 +149,9 @@ $navItems = [
 			<ul class="space-y-2 text-sm font-medium text-paper/70">
 				<li><a href="/gallery" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Gallery</a></li>
 				<li><a href="/edit" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Edit</a></li>
-				<li><a href="/register" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Sign up</a></li>
+				<?php if (!$isAuth): ?>
+					<li><a href="/register" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Sign up</a></li>
+				<?php endif; ?>
 			</ul>
 		</div>
 
@@ -102,9 +159,20 @@ $navItems = [
 		<div class="col-span-1 md:col-span-2">
 			<p class="font-display font-black text-sm uppercase mb-3">Account</p>
 			<ul class="space-y-2 text-sm font-medium text-paper/70">
-				<li><a href="/login" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Sign in</a></li>
-				<li><a href="/profile" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Profile</a></li>
-				<li><a href="/reset" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Reset password</a></li>
+				<?php if ($isAuth): ?>
+					<li><a href="/profile" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Profile</a></li>
+					<li>
+						<form method="POST" action="/logout" class="inline">
+							<?= Csrf::field() ?>
+							<button type="submit" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">
+								Sign out
+							</button>
+						</form>
+					</li>
+				<?php else: ?>
+					<li><a href="/login" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Sign in</a></li>
+					<li><a href="/reset" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Reset password</a></li>
+				<?php endif; ?>
 			</ul>
 		</div>
 
