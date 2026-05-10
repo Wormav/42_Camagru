@@ -13,17 +13,38 @@ class View
 		$this->templatesDir = rtrim($templatesDir, "/") . "/";
 	}
 
-	public function render(string $template, array $data = []): void
+
+	public function render(string $template, array $data = [], ?string $layout = "app"): void
 	{
 		$templatePath = $this->templatesDir . $template . ".php";
 		if (!file_exists($templatePath)) {
 			throw new \RuntimeException("Template not found: " . $templatePath);
 		}
 
-		// for not xss injection
+		// Escape helper used by every template/layout to prevent XSS.
 		$e = static fn (mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 
 		extract($data, EXTR_SKIP);
-		require $templatePath;
+
+		ob_start();
+		try {
+			require $templatePath;
+		} catch (\Throwable $error) {
+			ob_end_clean();
+			throw $error;
+		}
+		$content = ob_get_clean();
+
+		if ($layout === null) {
+			echo $content;
+			return;
+		}
+
+		$layoutPath = $this->templatesDir . "layouts/" . $layout . ".php";
+		if (!file_exists($layoutPath)) {
+			throw new \RuntimeException("Layout not found: " . $layoutPath);
+		}
+
+		require $layoutPath;
 	}
 }

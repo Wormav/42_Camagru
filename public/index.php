@@ -13,14 +13,21 @@ if (PHP_SAPI === "cli-server") {
 
 require __DIR__ . "/../vendor/autoload.php";
 
+use App\Controller\AuthController;
 use App\Controller\HomeController;
 use App\Core\Env;
 use App\Core\Router;
+use App\Core\Session;
 
 Env::load(__DIR__ . "/../.env");
+Session::start();
 
 $router = new Router();
 
 $router->get("/", [HomeController::class, "index"]);
+$router->get("/register", [AuthController::class, "showRegister"]);
+$router->post("/register", [AuthController::class, "register"]);
+$router->get("/register/check-email", [AuthController::class, "showCheckEmail"]);
+$router->get("/verify", [AuthController::class, "verify"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);
