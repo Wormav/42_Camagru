@@ -16,8 +16,6 @@ use Throwable;
 
 class AuthController
 {
-	private const FAKE_HASH = '$2y$10$CwTycUXWue0Thq9StjUM0uJ8X1lXLmvR9Q1k1l5JmA0dQ4yU/xK1y';
-
 	public function showRegister(): void
 	{
 		$this->renderRegister([], []);
@@ -161,10 +159,11 @@ class AuthController
 
 		$user = $users->findByUsername($username);
 
-		$hash = $user["password"] ?? self::FAKE_HASH;
-		$passwordOk = password_verify($password, $hash);
-
-		if ($user === null || !$passwordOk || (int) $user["is_verified"] !== 1) {
+		if (
+			$user === null
+			|| !password_verify($password, $user["password"])
+			|| (int) $user["is_verified"] !== 1
+		) {
 			$this->renderLogin(["Invalid credentials."], $old);
 			return;
 		}
