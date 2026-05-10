@@ -29,5 +29,8 @@ $router->get("/register", [AuthController::class, "showRegister"]);
 $router->post("/register", [AuthController::class, "register"]);
 $router->get("/register/check-email", [AuthController::class, "showCheckEmail"]);
 $router->get("/verify", [AuthController::class, "verify"]);
+$router->get("/login", [AuthController::class, "showLogin"]);
+$router->post("/login", [AuthController::class, "login"]);
+$router->post("/logout", [AuthController::class, "logout"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);

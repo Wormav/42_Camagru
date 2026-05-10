@@ -45,6 +45,13 @@
 		font-weight: 900;
 		letter-spacing: -0.02em;
 	}
+
+	summary {
+		list-style: none;
+	}
+	summary::-webkit-details-marker {
+		display: none;
+	}
 }
 
 @layer components {
@@ -85,6 +92,9 @@
 	}
 	.btn-brutal--cyan {
 		background: theme("colors.cyan");
+	}
+	.btn-brutal--coral {
+		background: theme("colors.coral");
 	}
 	.btn-brutal--ink {
 		background: theme("colors.ink");

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Database;
+use App\Core\Session;
 use App\Core\Validator;
 use App\Model\User;
 use App\Service\Mailer;
@@ -14,6 +16,8 @@ use Throwable;
 
 class AuthController
 {
+	private const FAKE_HASH = '$2y$10$CwTycUXWue0Thq9StjUM0uJ8X1lXLmvR9Q1k1l5JmA0dQ4yU/xK1y';
+
 	public function showRegister(): void
 	{
 		$this->renderRegister([], []);
@@ -119,6 +123,82 @@ class AuthController
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("auth/register", [
 			"title"  => "Sign up",
+			"errors" => $errors,
+			"old"    => $old,
+		]);
+	}
+
+	public function showLogin(): void
+	{
+		Auth::requireGuest();
+		$this->renderLogin([], []);
+	}
+
+	public function login(): void
+	{
+		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
+			? $_POST[Csrf::fieldName()]
+			: "";
+		if (!Csrf::validate($submittedToken)) {
+			http_response_code(403);
+			echo "Forbidden";
+			return;
+		}
+
+		$username = is_string($_POST["username"] ?? null) ? trim($_POST["username"]) : "";
+		$password = is_string($_POST["password"] ?? null) ? $_POST["password"] : "";
+
+		$old = ["username" => $username];
+
+		if ($username === "" || $password === "") {
+			$this->renderLogin(["Invalid credentials."], $old);
+			return;
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+		$users    = new User($pdo);
+
+		$user = $users->findByUsername($username);
+
+		$hash = $user["password"] ?? self::FAKE_HASH;
+		$passwordOk = password_verify($password, $hash);
+
+		if ($user === null || !$passwordOk || (int) $user["is_verified"] !== 1) {
+			$this->renderLogin(["Invalid credentials."], $old);
+			return;
+		}
+
+		Session::regenerate();
+		Session::set("user_id", (int) $user["id"]);
+		Session::set("username", $user["username"]);
+
+		header("Location: /");
+		exit;
+	}
+
+	public function logout(): void
+	{
+		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
+			? $_POST[Csrf::fieldName()]
+			: "";
+		if (!Csrf::validate($submittedToken)) {
+			http_response_code(403);
+			echo "Forbidden";
+			return;
+		}
+
+		Session::destroy();
+
+		header("Location: /");
+		exit;
+	}
+
+	private function renderLogin(array $errors, array $old): void
+	{
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("auth/login", [
+			"title"  => "Sign in",
 			"errors" => $errors,
 			"old"    => $old,
 		]);
