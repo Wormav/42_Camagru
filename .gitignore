@@ -70,6 +70,12 @@ storage/
 tmp/
 temp/
 
+# Keep the avatars directory tracked (via .gitkeep) but ignore actual uploads.
+!public/uploads/
+!public/uploads/avatars/
+public/uploads/avatars/*
+!public/uploads/avatars/.gitkeep
+
 # ===========================
 # Docker
 # ===========================

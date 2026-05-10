@@ -17,6 +17,7 @@ CREATE TABLE users (
     reset_token         VARCHAR(255)    DEFAULT NULL,
     reset_token_expires DATETIME        DEFAULT NULL,
     notify_comments     BOOLEAN         NOT NULL DEFAULT TRUE,
+    avatar_path         VARCHAR(255)    DEFAULT NULL,
     created_at          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
                                                  ON UPDATE CURRENT_TIMESTAMP
