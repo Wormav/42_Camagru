@@ -235,8 +235,6 @@ class AuthController
 		$pdo      = (new Database($dbConfig))->connection();
 		$users    = new User($pdo);
 
-		// Only send a reset email to verified accounts. We do not leak that
-		// the address is unknown — the success page is always the same.
 		$user = $users->findByEmail($email);
 		if ($user !== null && (int) $user["is_verified"] === 1) {
 			$token     = bin2hex(random_bytes(32));
@@ -249,8 +247,6 @@ class AuthController
 				$users->setResetToken((int) $user["id"], $token, $expiresAt);
 				$mailer->sendPasswordReset($email, $user["username"], $token);
 			} catch (Throwable $error) {
-				// Swallow errors here on purpose — we keep the generic success
-				// response to avoid email enumeration.
 				error_log("Password reset email failed for {$email}: " . $error->getMessage());
 			}
 		}
