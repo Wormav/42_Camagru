@@ -13,7 +13,7 @@ use App\Core\Flash;
 
 $navItems = [
 	["label" => "Gallery", "href" => "/gallery"],
-	["label" => "Edit",    "href" => "/edit"],
+	["label" => "Post",    "href" => "/post"],
 ];
 
 $isAuth     = Auth::check();
@@ -194,7 +194,7 @@ $flashError   = Flash::get("error");
 			<p class="font-display font-black text-sm uppercase mb-3">Product</p>
 			<ul class="space-y-2 text-sm font-medium text-paper/70">
 				<li><a href="/gallery" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Gallery</a></li>
-				<li><a href="/edit" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Edit</a></li>
+				<li><a href="/post" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Post</a></li>
 				<?php if (!$isAuth): ?>
 					<li><a href="/register" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Sign up</a></li>
 				<?php endif; ?>
@@ -226,8 +226,8 @@ $flashError   = Flash::get("error");
 		<div class="col-span-2 md:col-span-3">
 			<p class="font-display font-black text-sm uppercase mb-3">Stack</p>
 			<ul class="space-y-2 text-sm font-mono text-paper/70">
-				<li>PHP 8.1 + GD</li>
-				<li>MySQL 8.0 + PDO</li>
+				<li>PHP 8.1</li>
+				<li>MySQL 8.0</li>
 				<li>Tailwind CLI</li>
 				<li>Docker Compose</li>
 			</ul>

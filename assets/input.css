@@ -83,6 +83,19 @@
 		transform: translate(2px, 2px);
 		box-shadow: 2px 2px 0 0 theme("colors.ink");
 	}
+	.btn-brutal:disabled,
+	.btn-brutal[aria-disabled="true"] {
+		opacity: 0.45;
+		cursor: not-allowed;
+		filter: grayscale(0.4);
+	}
+	.btn-brutal:disabled:hover,
+	.btn-brutal[aria-disabled="true"]:hover,
+	.btn-brutal:disabled:active,
+	.btn-brutal[aria-disabled="true"]:active {
+		transform: none;
+		box-shadow: theme("boxShadow.brutal");
+	}
 
 	.btn-brutal--white {
 		background: #ffffff;

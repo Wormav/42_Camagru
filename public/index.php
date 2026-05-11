@@ -15,6 +15,7 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use App\Controller\AuthController;
 use App\Controller\HomeController;
+use App\Controller\PostController;
 use App\Controller\ProfileController;
 use App\Core\Env;
 use App\Core\Router;
@@ -44,5 +45,6 @@ $router->post("/profile/email", [ProfileController::class, "updateEmail"]);
 $router->post("/profile/password", [ProfileController::class, "updatePassword"]);
 $router->post("/profile/notifications", [ProfileController::class, "updateNotifications"]);
 $router->post("/profile/avatar", [ProfileController::class, "updateAvatar"]);
+$router->get("/post", [PostController::class, "showPost"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);
