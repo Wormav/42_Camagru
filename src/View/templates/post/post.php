@@ -45,6 +45,12 @@
 						class="absolute inset-0 w-full h-full object-cover hidden"
 					></video>
 
+					<img
+						data-stage-image
+						alt=""
+						class="absolute inset-0 w-full h-full object-contain bg-ink hidden"
+					>
+
 					<div data-stage-status data-stage-state="idle" class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-paper">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-14 h-14 opacity-70" aria-hidden="true">
 							<rect x="3" y="6" width="18" height="13" rx="0"/>
@@ -73,7 +79,7 @@
 							<line x1="12" y1="3" x2="12" y2="15"/>
 						</svg>
 						Upload image
-						<input type="file" accept="image/jpeg,image/png" class="hidden" disabled>
+						<input type="file" data-action="use-upload" accept="image/jpeg,image/png" class="hidden">
 					</label>
 				</div>
 			</section>
