@@ -120,6 +120,7 @@
 			<div class="flex justify-end">
 				<button
 					type="button"
+					data-action="capture"
 					disabled
 					aria-disabled="true"
 					class="btn-brutal btn-brutal--ink w-full sm:w-auto"

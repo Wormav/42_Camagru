@@ -6,10 +6,14 @@
 	const label = document.querySelector("[data-stage-status-label]");
 	const webcamBtn = document.querySelector("[data-action='use-webcam']");
 	const fileInput = document.querySelector("[data-action='use-upload']");
+	const overlayList = document.querySelector("[data-overlay-list]");
+	const captureBtn = document.querySelector("[data-action='capture']");
 
 	if (!video || !imageEl || !status || !label) {
 		return;
 	}
+
+	let selectedOverlayId = null;
 
 	const ACCEPTED_MIMES = ["image/jpeg", "image/png"];
 	const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -77,8 +81,19 @@
 			video.srcObject = stream;
 
 			showSource("webcam");
-		} catch (_error) {
-			showStatus("denied");
+		} catch (error) {
+			console.warn("[post] getUserMedia failed:", error);
+
+			const name = error instanceof DOMException ? error.name : "";
+			const labels = {
+				NotAllowedError: "// camera access denied — check browser permissions",
+				NotFoundError: "// no camera found — try upload instead",
+				NotReadableError: "// camera busy — close other apps using it",
+				OverconstrainedError: "// camera does not match constraints",
+				SecurityError: "// camera blocked — page must be served over HTTPS",
+				AbortError: "// camera start aborted — try again",
+			};
+			showStatus("denied", labels[name] ?? "// camera unavailable — try upload instead");
 		}
 	};
 
@@ -123,6 +138,52 @@
 			}
 			loadUploadedImage(file);
 			target.value = "";
+		});
+	}
+
+	const updateCaptureButton = () => {
+		if (captureBtn === null) {
+			return;
+		}
+		if (selectedOverlayId === null) {
+			captureBtn.setAttribute("disabled", "");
+			captureBtn.setAttribute("aria-disabled", "true");
+		} else {
+			captureBtn.removeAttribute("disabled");
+			captureBtn.setAttribute("aria-disabled", "false");
+		}
+	};
+
+	const toggleOverlay = (tile) => {
+		const isActive = tile.getAttribute("aria-pressed") === "true";
+
+		if (overlayList !== null) {
+			for (const other of overlayList.querySelectorAll("[aria-pressed='true']")) {
+				other.setAttribute("aria-pressed", "false");
+			}
+		}
+
+		if (isActive) {
+			selectedOverlayId = null;
+		} else {
+			tile.setAttribute("aria-pressed", "true");
+			selectedOverlayId = tile.dataset.overlayId ?? null;
+		}
+
+		updateCaptureButton();
+	};
+
+	if (overlayList !== null) {
+		overlayList.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) {
+				return;
+			}
+			const tile = target.closest("[data-overlay-id]");
+			if (tile === null || !overlayList.contains(tile)) {
+				return;
+			}
+			toggleOverlay(tile);
 		});
 	}
 
