@@ -36,18 +36,29 @@
 				</div>
 
 				<div class="relative w-full aspect-video border-3 border-ink bg-ink overflow-hidden">
-					<div class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-paper">
+
+					<video
+						data-stage-video
+						autoplay
+						muted
+						playsinline
+						class="absolute inset-0 w-full h-full object-cover hidden"
+					></video>
+
+					<div data-stage-status data-stage-state="idle" class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-paper">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-14 h-14 opacity-70" aria-hidden="true">
 							<rect x="3" y="6" width="18" height="13" rx="0"/>
 							<circle cx="12" cy="12.5" r="3.5"/>
 							<path d="M8 6l1.5-2h5L16 6"/>
 						</svg>
-						<p class="font-mono text-xs uppercase tracking-widest opacity-70">// webcam preview goes here</p>
+						<p data-stage-status-label class="font-mono text-xs uppercase tracking-widest opacity-70">
+							// webcam preview goes here
+						</p>
 					</div>
 				</div>
 
 				<div class="mt-5 flex flex-col sm:flex-row gap-3">
-					<button type="button" class="btn-brutal btn-brutal--cyan flex-1">
+					<button type="button" data-action="use-webcam" class="btn-brutal btn-brutal--cyan flex-1">
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
 							<rect x="3" y="6" width="18" height="13" rx="0"/>
 							<circle cx="12" cy="12.5" r="3.5"/>

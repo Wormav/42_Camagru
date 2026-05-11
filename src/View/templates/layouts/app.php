@@ -34,6 +34,10 @@ $flashError   = Flash::get("error");
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="/style.css">
 	<script src="/js/toast.js" defer></script>
+	<?php foreach (($scripts ?? []) as $scriptSrc): ?>
+    	<script src="<?= $e($scriptSrc) ?>" defer></script>
+    <?php endforeach; ?>
+
 </head>
 <body class="min-h-screen flex flex-col">
 

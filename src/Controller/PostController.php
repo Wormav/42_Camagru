@@ -16,6 +16,7 @@ class PostController
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("post/post", [
 			"title" => "Post",
+			 "scripts" => ["/js/post.js"],
 		]);
 	}
 }
