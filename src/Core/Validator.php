@@ -128,4 +128,33 @@ class Validator
 
 		return null;
 	}
+
+	public static function validateSnapUpload(array $file): ?string
+	{
+		$errorCode = is_int($file["error"] ?? null) ? $file["error"] : UPLOAD_ERR_NO_FILE;
+		if ($errorCode === UPLOAD_ERR_NO_FILE) {
+			return "No snap submitted.";
+		}
+		if ($errorCode !== UPLOAD_ERR_OK) {
+			return "Snap upload failed. Please try again.";
+		}
+
+		$maxSize = 10 * 1024 * 1024; // 10 MB — accommodates high-res webcams
+		$size    = is_int($file["size"] ?? null) ? $file["size"] : 0;
+		if ($size <= 0 || $size > $maxSize) {
+			return "Snap must be 10MB or smaller.";
+		}
+
+		$tmpPath = is_string($file["tmp_name"] ?? null) ? $file["tmp_name"] : "";
+		if ($tmpPath === "" || !is_uploaded_file($tmpPath)) {
+			return "Snap upload is invalid.";
+		}
+
+		$detectedMime = mime_content_type($tmpPath);
+		if ($detectedMime !== "image/jpeg") {
+			return "Snap must be a JPEG image.";
+		}
+
+		return null;
+	}
 }

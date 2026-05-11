@@ -186,6 +186,107 @@
 			toggleOverlay(tile);
 		});
 	}
+	const getCsrfToken = () => {
+		const meta = document.querySelector("meta[name='csrf-token']");
+		return meta instanceof HTMLMetaElement ? meta.content : "";
+	};
+
+	const detectCurrentSource = () => {
+		if (!video.classList.contains("hidden") && activeStream !== null) {
+			return "webcam";
+		}
+		if (!imageEl.classList.contains("hidden") && imageEl.src !== "") {
+			return "image";
+		}
+		return null;
+	};
+
+	const grabCurrentFrame = () =>
+		new Promise((resolve) => {
+			const source = detectCurrentSource();
+
+			if (source === null) {
+				resolve(null);
+				return;
+			}
+
+			const width = source === "webcam" ? video.videoWidth : imageEl.naturalWidth;
+			const height = source === "webcam" ? video.videoHeight : imageEl.naturalHeight;
+
+			if (!width || !height) {
+				resolve(null);
+				return;
+			}
+
+			const canvas = document.createElement("canvas");
+			canvas.width = width;
+			canvas.height = height;
+
+			const ctx = canvas.getContext("2d");
+			if (ctx === null) {
+				resolve(null);
+				return;
+			}
+			ctx.drawImage(source === "webcam" ? video : imageEl, 0, 0, width, height);
+
+			canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92);
+		});
+
+	const toast = (message, kind = "success") => {
+		document.dispatchEvent(
+			new CustomEvent("toast:show", {
+				detail: { message, kind },
+			}),
+		);
+	};
+
+	const captureSnap = async () => {
+		if (selectedOverlayId === null || captureBtn === null) {
+			return;
+		}
+
+		captureBtn.setAttribute("disabled", "");
+		captureBtn.setAttribute("aria-disabled", "true");
+
+		try {
+			const blob = await grabCurrentFrame();
+			if (blob === null) {
+				toast("No source ready — start the webcam or upload an image.", "error");
+				return;
+			}
+
+			const formData = new FormData();
+			formData.append("csrf_token", getCsrfToken());
+			formData.append("overlay_id", selectedOverlayId);
+			formData.append("snap", blob, "snap.jpg");
+
+			const response = await fetch("/post/capture", {
+				method: "POST",
+				body: formData,
+				credentials: "same-origin",
+			});
+
+			const payload = await response.json().catch(() => ({}));
+
+			if (!response.ok || payload.ok !== true) {
+				const message =
+					typeof payload.error === "string" ? payload.error : `Capture failed (${response.status}).`;
+				toast(message, "error");
+				return;
+			}
+
+			toast("Snap captured ✓");
+		} catch (error) {
+			console.warn("[post] capture failed:", error);
+			toast("Network error — please try again.", "error");
+		} finally {
+			updateCaptureButton();
+		}
+	};
+
+	if (captureBtn !== null) {
+		captureBtn.addEventListener("click", captureSnap);
+	}
 
 	window.addEventListener("pagehide", stopActiveStream);
 })();
