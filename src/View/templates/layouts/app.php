@@ -7,16 +7,16 @@
  * @var string|null             $title    Optional page title.
  */
 
-use App\Core\Auth;
-use App\Core\Csrf;
+use App\Core\Flash;
 
 $navItems = [
 	["label" => "Gallery", "href" => "/gallery"],
 	["label" => "Edit",    "href" => "/edit"],
 ];
 
-$isAuth   = Auth::check();
-$username = Auth::username();
+
+$flashSuccess = Flash::get("success");
+$flashError   = Flash::get("error");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,8 +26,7 @@ $username = Auth::username();
 	<meta name="theme-color" content="#FFF8E1">
 	<title><?= $e($title ?? "Camagru") ?></title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link rel="stylesheet" href="/style.css">
+	<script src="/js/toast.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col">
 
@@ -117,10 +116,23 @@ $username = Auth::username();
 	</div>
 </header>
 
-<!-- Page content -->
-<main class="relative z-10 flex-1 w-full">
-	<?= $content ?>
-</main>
+<!-- Toasts container — fixed bottom-right, auto-dismiss via /js/toast.js -->
+<?php if ($flashSuccess !== null || $flashError !== null): ?>
+	<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-[calc(100%-3rem)] sm:w-auto pointer-events-none">
+		<?php if ($flashSuccess !== null): ?>
+			<div class="toast toast--success" data-toast role="status">
+				<span class="flex-1"><?= $e($flashSuccess) ?></span>
+				<button type="button" class="toast__close" data-toast-close aria-label="Dismiss">×</button>
+			</div>
+		<?php endif; ?>
+		<?php if ($flashError !== null): ?>
+			<div class="toast toast--error" data-toast data-toast-duration="6000" role="alert">
+				<span class="flex-1"><?= $e($flashError) ?></span>
+				<button type="button" class="toast__close" data-toast-close aria-label="Dismiss">×</button>
+			</div>
+		<?php endif; ?>
+	</div>
+<?php endif; ?>
 
 <!-- Footer -->
 <footer class="relative z-10 border-t-3 border-ink bg-dark text-paper mt-24">

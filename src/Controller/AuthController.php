@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Database;
+use App\Core\Flash;
 use App\Core\Session;
 use App\Core\Validator;
 use App\Model\User;
@@ -171,6 +172,8 @@ class AuthController
 		Session::regenerate();
 		Session::set("user_id", (int) $user["id"]);
 		Session::set("username", $user["username"]);
+
+		Flash::success("Welcome back, " . $user["username"] . " 👋");
 
 		header("Location: /");
 		exit;
