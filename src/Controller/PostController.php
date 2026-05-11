@@ -13,10 +13,13 @@ class PostController
 	{
 		Auth::requireAuth();
 
+		$overlays = require __DIR__ . "/../../config/overlays.php";
+
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("post/post", [
-			"title" => "Post",
-			 "scripts" => ["/js/post.js"],
+			"title"    => "Post",
+			"scripts"  => ["/js/post.js"],
+			"overlays" => $overlays,
 		]);
 	}
 }

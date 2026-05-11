@@ -1,7 +1,8 @@
 <?php
 /**
- * @var \Closure(mixed): string $e      Escape helper.
- * @var string                  $title  Page title.
+ * @var \Closure(mixed): string $e         Escape helper.
+ * @var string                  $title     Page title.
+ * @var array<string,array{id:string,label:string,path:string}> $overlays
  */
 ?>
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
@@ -90,12 +91,29 @@
 					<span class="font-mono text-xs uppercase tracking-widest opacity-60">// pick one</span>
 				</div>
 
-				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-					<?php for ($i = 1; $i <= 5; $i++): ?>
-						<div class="aspect-square border-3 border-ink bg-white flex items-center justify-center font-mono text-xs uppercase opacity-50">
-							#<?= $i ?>
-						</div>
-					<?php endfor; ?>
+				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" data-overlay-list>
+					<?php foreach ($overlays as $overlay): ?>
+						<button
+							type="button"
+							data-overlay-id="<?= $e($overlay["id"]) ?>"
+							data-overlay-path="<?= $e($overlay["path"]) ?>"
+							aria-pressed="false"
+							class="overlay-tile group"
+							title="<?= $e($overlay["label"]) ?>"
+						>
+							<span class="overlay-tile__thumb">
+								<img
+									src="<?= $e($overlay["path"]) ?>"
+									alt=""
+									loading="lazy"
+									class="w-full h-full object-contain"
+								>
+							</span>
+							<span class="overlay-tile__label">
+								<?= $e($overlay["label"]) ?>
+							</span>
+						</button>
+					<?php endforeach; ?>
 				</div>
 			</section>
 
