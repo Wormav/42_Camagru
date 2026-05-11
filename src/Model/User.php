@@ -115,4 +115,64 @@ class User
 		]);
 		return $stmt->rowCount() === 1;
 	}
+
+	public function updateUsername(int $userId, string $newUsername): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users SET username = :username WHERE id = :id",
+		);
+		$stmt->execute([
+			":username" => $newUsername,
+			":id"       => $userId,
+		]);
+		return $stmt->rowCount() === 1;
+	}
+
+	public function updateEmail(int $userId, string $newEmail): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users SET email = :email WHERE id = :id",
+		);
+		$stmt->execute([
+			":email" => $newEmail,
+			":id"    => $userId,
+		]);
+		return $stmt->rowCount() === 1;
+	}
+
+	public function updatePassword(int $userId, string $passwordHash): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users SET password = :password WHERE id = :id",
+		);
+		$stmt->execute([
+			":password" => $passwordHash,
+			":id"       => $userId,
+		]);
+		return $stmt->rowCount() === 1;
+	}
+
+	public function updateNotifyComments(int $userId, bool $notify): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users SET notify_comments = :notify WHERE id = :id",
+		);
+		$stmt->execute([
+			":notify" => $notify ? 1 : 0,
+			":id"     => $userId,
+		]);
+		return $stmt->rowCount() <= 1;
+	}
+
+	public function updateAvatar(int $userId, ?string $avatarPath): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"UPDATE users SET avatar_path = :path WHERE id = :id",
+		);
+		$stmt->execute([
+			":path" => $avatarPath,
+			":id"   => $userId,
+		]);
+		return $stmt->rowCount() === 1;
+	}
 }

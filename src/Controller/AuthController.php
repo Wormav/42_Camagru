@@ -172,12 +172,15 @@ class AuthController
 		Session::regenerate();
 		Session::set("user_id", (int) $user["id"]);
 		Session::set("username", $user["username"]);
+		Session::set("avatar_path", $user["avatar_path"] ?? null);
 
 		Flash::success("Welcome back, " . $user["username"] . " 👋");
 
 		header("Location: /");
 		exit;
 	}
+
+
 
 	public function logout(): void
 	{

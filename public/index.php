@@ -39,5 +39,10 @@ $router->get("/reset/sent", [AuthController::class, "showForgotPasswordSent"]);
 $router->get("/reset/confirm", [AuthController::class, "showResetPassword"]);
 $router->post("/reset/confirm", [AuthController::class, "resetPassword"]);
 $router->get("/profile", [ProfileController::class, "showProfile"]);
+$router->post("/profile/username", [ProfileController::class, "updateUsername"]);
+$router->post("/profile/email", [ProfileController::class, "updateEmail"]);
+$router->post("/profile/password", [ProfileController::class, "updatePassword"]);
+$router->post("/profile/notifications", [ProfileController::class, "updateNotifications"]);
+$router->post("/profile/avatar", [ProfileController::class, "updateAvatar"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);
