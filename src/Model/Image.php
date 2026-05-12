@@ -39,4 +39,25 @@ class Image
 		$stmt->execute([":user_id" => $userId]);
 		return $stmt->fetchAll();
 	}
+
+	public function findById(int $id): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			"SELECT id, user_id, image_path, overlay_used, created_at
+			FROM images
+			WHERE id = :id LIMIT 1",
+		);
+		$stmt->execute([":id" => $id]);
+		$row = $stmt->fetch();
+		return $row !== false ? $row : null;
+	}
+
+	public function delete(int $id): bool
+	{
+		$stmt = $this->pdo->prepare(
+			"DELETE FROM images WHERE id = :id",
+		);
+		$stmt->execute([":id" => $id]);
+		return $stmt->rowCount() === 1;
+	}
 }
