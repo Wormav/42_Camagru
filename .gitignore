@@ -75,6 +75,8 @@ temp/
 !public/uploads/avatars/
 public/uploads/avatars/*
 !public/uploads/avatars/.gitkeep
+public/uploads/snaps/*
+!public/uploads/snaps/.gitkeep
 
 # ===========================
 # Docker

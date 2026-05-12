@@ -6,11 +6,17 @@ namespace App\Controller;
 
 use App\Core\Auth;
 use App\Core\Csrf;
+use App\Core\Database;
 use App\Core\Validator;
+use App\Model\Image;
+use App\Service\ImageComposer;
 use App\View\View;
 
 class PostController
 {
+	private const SNAPS_DIR           = __DIR__ . "/../../public/uploads/snaps";
+	private const SNAPS_PUBLIC_PREFIX = "/uploads/snaps/";
+
 	public function showPost(): void
 	{
 		Auth::requireAuth();
@@ -53,8 +59,22 @@ class PostController
 			$this->jsonError(400, $validationError);
 		}
 
+		$overlayAbsPath = __DIR__ . "/../../public" . $overlay["path"];
+
+		$composer = new ImageComposer();
+		$fileName = $composer->merge($file["tmp_name"], $overlayAbsPath, self::SNAPS_DIR);
+		if ($fileName === null) {
+			$this->jsonError(500, "Failed to compose snap.");
+		}
+
+		$publicPath = self::SNAPS_PUBLIC_PREFIX . $fileName;
+		$dbConfig   = require __DIR__ . "/../../config/database.php";
+		$pdo        = (new Database($dbConfig))->connection();
+		$imageId    = (new Image($pdo))->create((int) Auth::id(), $publicPath, $overlay["id"]);
+
 		$this->jsonSuccess([
-			"message"    => "Snap received.",
+			"image_id"   => $imageId,
+			"image_path" => $publicPath,
 			"overlay_id" => $overlay["id"],
 		]);
 	}
