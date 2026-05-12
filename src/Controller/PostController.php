@@ -22,12 +22,16 @@ class PostController
 		Auth::requireAuth();
 
 		$overlays = require __DIR__ . "/../../config/overlays.php";
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo = (new Database($dbConfig))->connection();
+		$userImages = (new Image($pdo))->findByUserId((int) Auth::id());
 
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("post/post", [
 			"title"    => "Post",
 			"scripts"  => ["/js/post.js"],
 			"overlays" => $overlays,
+			"userImages" => $userImages,
 		]);
 	}
 
@@ -68,15 +72,55 @@ class PostController
 		}
 
 		$publicPath = self::SNAPS_PUBLIC_PREFIX . $fileName;
-		$dbConfig   = require __DIR__ . "/../../config/database.php";
-		$pdo        = (new Database($dbConfig))->connection();
-		$imageId    = (new Image($pdo))->create((int) Auth::id(), $publicPath, $overlay["id"]);
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo = (new Database($dbConfig))->connection();
+		$imageId = (new Image($pdo))->create((int) Auth::id(), $publicPath, $overlay["id"]);
 
 		$this->jsonSuccess([
 			"image_id"   => $imageId,
 			"image_path" => $publicPath,
 			"overlay_id" => $overlay["id"],
 		]);
+	}
+
+	public function delete(): void
+	{
+		Auth::requireAuth();
+
+		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
+			? $_POST[Csrf::fieldName()]
+			: "";
+		if (!Csrf::validate($submittedToken)) {
+			$this->jsonError(403, "Invalid CSRF token.");
+		}
+
+		$imageId = (int) ($_POST["image_id"] ?? 0);
+		if ($imageId <= 0) {
+			$this->jsonError(400, "Missing image id.");
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo = (new Database($dbConfig))->connection();
+		$images = new Image($pdo);
+
+		$image = $images->findById($imageId);
+		if ($image === null) {
+			$this->jsonError(404, "Image not found.");
+		}
+		if ((int) $image["user_id"] !== (int) Auth::id()) {
+			$this->jsonError(403, "Forbidden.");
+		}
+
+		$absPath = __DIR__ . "/../../public" . $image["image_path"];
+		if (is_file($absPath) && !@unlink($absPath)) {
+			$this->jsonError(500, "Could not delete file.");
+		}
+
+		if (!$images->delete($imageId)) {
+			$this->jsonError(500, "Could not delete record.");
+		}
+
+		$this->jsonSuccess(["image_id" => $imageId]);
 	}
 
 	private function jsonError(int $status, string $message): void

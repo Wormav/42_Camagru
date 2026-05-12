@@ -47,5 +47,6 @@ $router->post("/profile/notifications", [ProfileController::class, "updateNotifi
 $router->post("/profile/avatar", [ProfileController::class, "updateAvatar"]);
 $router->get("/post", [PostController::class, "showPost"]);
 $router->post("/post/capture", [PostController::class, "capture"]);
+$router->post("/post/delete", [PostController::class, "delete"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);
