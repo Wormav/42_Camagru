@@ -359,4 +359,69 @@
 		text-align: center;
 		color: theme("colors.ink");
 	}
+
+	.snap-tile {
+		position: relative;
+		display: block;
+		border: 3px solid theme("colors.ink");
+		background: theme("colors.ink");
+		transition:
+			transform 0.12s ease,
+			box-shadow 0.12s ease;
+	}
+	.snap-tile:hover {
+		transform: translate(-2px, -2px);
+		box-shadow: theme("boxShadow.brutal-sm");
+	}
+
+	.snap-tile__thumb {
+		display: block;
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		overflow: hidden;
+		cursor: zoom-in;
+		background: theme("colors.ink");
+	}
+	.snap-tile__thumb:focus-visible {
+		outline: 3px solid theme("colors.lime");
+		outline-offset: -3px;
+	}
+
+	.snap-tile__delete {
+		position: absolute;
+		top: -8px;
+		right: -8px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		background: theme("colors.coral");
+		color: theme("colors.ink");
+		border: 3px solid theme("colors.ink");
+		box-shadow: theme("boxShadow.brutal-sm");
+		cursor: pointer;
+		opacity: 0;
+		transition:
+			opacity 0.12s ease,
+			transform 0.12s ease,
+			box-shadow 0.12s ease;
+	}
+	.snap-tile:hover .snap-tile__delete,
+	.snap-tile:focus-within .snap-tile__delete,
+	.snap-tile__delete:focus-visible {
+		opacity: 1;
+	}
+	.snap-tile__delete:hover {
+		transform: translate(-1px, -1px);
+		box-shadow: 4px 4px 0 0 theme("colors.ink");
+	}
+	.snap-tile__delete:active {
+		transform: translate(1px, 1px);
+		box-shadow: 1px 1px 0 0 theme("colors.ink");
+	}
+
+	[data-lightbox][data-open="true"] {
+		display: flex;
+	}
 }
