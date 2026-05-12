@@ -3,7 +3,9 @@
  * @var \Closure(mixed): string $e         Escape helper.
  * @var string                  $title     Page title.
  * @var array<string,array{id:string,label:string,path:string}> $overlays
+ * @var array<int,array{id:int,user_id:int,image_path:string,overlay_used:?string,created_at:string}> $userImages
  */
+$imageCount = count($userImages);
 ?>
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
 
@@ -139,10 +141,13 @@
 			<section class="brutal-card bg-paper !p-5 sm:!p-6">
 				<div class="flex items-center justify-between gap-3 mb-4">
 					<p class="brutal-label !mb-0">Your snaps</p>
-					<span class="brutal-tag bg-pink">0</span>
+					<span class="brutal-tag bg-pink" data-snaps-count><?= $e($imageCount) ?></span>
 				</div>
 
-				<div class="border-3 border-ink bg-white p-6 text-center">
+				<div
+					data-snaps-empty
+					class="border-3 border-ink bg-white p-6 text-center<?= $imageCount > 0 ? " hidden" : "" ?>"
+				>
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 mx-auto opacity-60" aria-hidden="true">
 						<rect x="3" y="3" width="18" height="18" rx="0"/>
 						<circle cx="9" cy="9" r="2"/>
@@ -152,6 +157,49 @@
 					<p class="mt-2 font-mono text-xs opacity-60">
 						// your captures will appear here.
 					</p>
+				</div>
+
+				<div
+					data-snaps-list
+					class="grid grid-cols-2 gap-3<?= $imageCount === 0 ? " hidden" : "" ?>"
+				>
+					<?php foreach ($userImages as $image): ?>
+						<figure
+							data-snap-item
+							data-image-id="<?= $e($image["id"]) ?>"
+							class="snap-tile group"
+						>
+							<button
+								type="button"
+								data-action="open-lightbox"
+								data-image-src="<?= $e($image["image_path"]) ?>"
+								class="snap-tile__thumb"
+								aria-label="View snap"
+							>
+								<img
+									src="<?= $e($image["image_path"]) ?>"
+									alt="Snap"
+									loading="lazy"
+									class="w-full h-full object-cover"
+								>
+							</button>
+							<button
+								type="button"
+								data-action="delete-snap"
+								class="snap-tile__delete"
+								aria-label="Delete snap"
+								title="Delete"
+							>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
+									<polyline points="3 6 5 6 21 6"/>
+									<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+									<path d="M10 11v6"/>
+									<path d="M14 11v6"/>
+									<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+								</svg>
+							</button>
+						</figure>
+					<?php endforeach; ?>
 				</div>
 			</section>
 
@@ -165,3 +213,50 @@
 		</aside>
 	</div>
 </section>
+
+<div
+	data-lightbox
+	data-open="false"
+	class="fixed inset-0 z-50 hidden items-center justify-center bg-ink/85 p-4 sm:p-8"
+	role="dialog"
+	aria-modal="true"
+	aria-label="Snap preview"
+>
+	<button
+		type="button"
+		data-action="close-lightbox"
+		aria-label="Close"
+		class="absolute top-4 right-4 sm:top-6 sm:right-6 inline-flex items-center justify-center w-12 h-12 border-3 border-ink bg-paper shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-lg transition-transform"
+	>
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
+			<line x1="18" y1="6" x2="6" y2="18"/>
+			<line x1="6" y1="6" x2="18" y2="18"/>
+		</svg>
+	</button>
+
+	<figure class="max-w-5xl max-h-full">
+		<img
+			data-lightbox-image
+			src=""
+			alt="Snap preview"
+			class="block max-w-full max-h-[85vh] border-3 border-ink shadow-brutal-lg bg-ink"
+		>
+	</figure>
+</div>
+
+<template data-snap-template>
+	<figure data-snap-item data-image-id="" class="snap-tile group">
+		<button type="button" data-action="open-lightbox" data-image-src="" class="snap-tile__thumb" aria-label="View snap">
+			<img src="" alt="Snap" loading="lazy" class="w-full h-full object-cover">
+		</button>
+		<button type="button" data-action="delete-snap" class="snap-tile__delete" aria-label="Delete snap" title="Delete">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
+				<polyline points="3 6 5 6 21 6"/>
+				<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+				<path d="M10 11v6"/>
+				<path d="M14 11v6"/>
+				<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+			</svg>
+		</button>
+	</figure>
+</template>

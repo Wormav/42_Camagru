@@ -9,6 +9,13 @@
 	const overlayList = document.querySelector("[data-overlay-list]");
 	const captureBtn = document.querySelector("[data-action='capture']");
 
+	const snapsList = document.querySelector("[data-snaps-list]");
+	const snapsEmpty = document.querySelector("[data-snaps-empty]");
+	const snapsCount = document.querySelector("[data-snaps-count]");
+	const snapTemplate = document.querySelector("[data-snap-template]");
+	const lightbox = document.querySelector("[data-lightbox]");
+	const lightboxImage = document.querySelector("[data-lightbox-image]");
+
 	if (!video || !imageEl || !status || !label) {
 		return;
 	}
@@ -273,6 +280,10 @@
 					typeof payload.error === "string" ? payload.error : `Capture failed (${response.status}).`;
 				toast(message, "error");
 				return;
+			}
+
+			if (typeof payload.image_id === "number" && typeof payload.image_path === "string") {
+				prependSnap(payload.image_id, payload.image_path);
 			}
 
 			toast("Snap captured ✓");
