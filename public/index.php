@@ -14,6 +14,7 @@ if (PHP_SAPI === "cli-server") {
 require __DIR__ . "/../vendor/autoload.php";
 
 use App\Controller\AuthController;
+use App\Controller\GalleryController;
 use App\Controller\HomeController;
 use App\Controller\PostController;
 use App\Controller\ProfileController;
@@ -45,6 +46,7 @@ $router->post("/profile/email", [ProfileController::class, "updateEmail"]);
 $router->post("/profile/password", [ProfileController::class, "updatePassword"]);
 $router->post("/profile/notifications", [ProfileController::class, "updateNotifications"]);
 $router->post("/profile/avatar", [ProfileController::class, "updateAvatar"]);
+$router->get("/gallery", [GalleryController::class, "showGallery"]);
 $router->get("/post", [PostController::class, "showPost"]);
 $router->post("/post/capture", [PostController::class, "capture"]);
 $router->post("/post/delete", [PostController::class, "delete"]);

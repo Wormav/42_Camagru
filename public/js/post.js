@@ -247,6 +247,95 @@
 		);
 	};
 
+	const prependSnap = (imageId, imagePath) => {
+		if (snapsList === null || !(snapTemplate instanceof HTMLTemplateElement)) {
+			return;
+		}
+
+		const fragment = snapTemplate.content.cloneNode(true);
+		const figure = fragment.querySelector("[data-snap-item]");
+		const thumbBtn = fragment.querySelector("[data-action='open-lightbox']");
+		const img = fragment.querySelector("img");
+
+		if (figure instanceof HTMLElement) {
+			figure.dataset.imageId = String(imageId);
+		}
+		if (thumbBtn instanceof HTMLElement) {
+			thumbBtn.dataset.imageSrc = imagePath;
+		}
+		if (img instanceof HTMLImageElement) {
+			img.src = imagePath;
+		}
+
+		snapsList.prepend(fragment);
+		snapsList.classList.remove("hidden");
+
+		if (snapsEmpty !== null) {
+			snapsEmpty.classList.add("hidden");
+		}
+
+		if (snapsCount !== null) {
+			const current = Number.parseInt(snapsCount.textContent ?? "0", 10);
+			snapsCount.textContent = String(Number.isNaN(current) ? 1 : current + 1);
+		}
+	};
+
+	const openLightbox = (imageSrc) => {
+		if (!(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) {
+			return;
+		}
+		lightboxImage.src = imageSrc;
+		lightbox.dataset.open = "true";
+		lightbox.classList.remove("hidden");
+		lightbox.classList.add("flex");
+	};
+
+	const closeLightbox = () => {
+		if (!(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) {
+			return;
+		}
+		lightbox.dataset.open = "false";
+		lightbox.classList.add("hidden");
+		lightbox.classList.remove("flex");
+		lightboxImage.src = "";
+	};
+
+	// Delegated click handler — works for current snaps AND newly prepended ones.
+	if (snapsList !== null) {
+		snapsList.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) {
+				return;
+			}
+			const trigger = target.closest("[data-action='open-lightbox']");
+			if (!(trigger instanceof HTMLElement) || !snapsList.contains(trigger)) {
+				return;
+			}
+			const src = trigger.dataset.imageSrc ?? "";
+			if (src !== "") {
+				openLightbox(src);
+			}
+		});
+	}
+
+	if (lightbox !== null) {
+		lightbox.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) {
+				return;
+			}
+			if (target === lightbox || target.closest("[data-action='close-lightbox']") !== null) {
+				closeLightbox();
+			}
+		});
+	}
+
+	document.addEventListener("keydown", (event) => {
+		if (event.key === "Escape" && lightbox instanceof HTMLElement && lightbox.dataset.open === "true") {
+			closeLightbox();
+		}
+	});
+
 	const captureSnap = async () => {
 		if (selectedOverlayId === null || captureBtn === null) {
 			return;

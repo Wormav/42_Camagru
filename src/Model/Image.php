@@ -60,4 +60,30 @@ class Image
 		$stmt->execute([":id" => $id]);
 		return $stmt->rowCount() === 1;
 	}
+
+	public function findFeed(int $limit, int $offset): array
+	{
+		$stmt = $this->pdo->prepare(
+			"SELECT images.id, images.user_id, images.image_path, images.overlay_used, images.created_at, users.username,
+			COUNT(DISTINCT likes.id) AS like_count,
+			COUNT(DISTINCT comments.id) AS comment_count
+			FROM images
+			JOIN users ON images.user_id = users.id
+			LEFT JOIN likes ON images.id = likes.image_id
+			LEFT JOIN comments ON images.id = comments.image_id
+			GROUP BY images.id
+			ORDER BY images.created_at DESC, images.id DESC
+			LIMIT :limit OFFSET :offset"
+		);
+		$stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+		$stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+
+	public function countAll(): int
+	{
+		$stmt = $this->pdo->query("SELECT COUNT(*) FROM images");
+		return (int) $stmt->fetchColumn();
+	}
 }
