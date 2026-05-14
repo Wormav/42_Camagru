@@ -69,8 +69,10 @@ clean:
 
 fclean:
 	@printf "$(YELLOW)▼ Stopping containers, dropping volumes & local images$(RESET)\n"
-	@printf "  $(DIM)→ this WIPES the database and removes custom images$(RESET)\n"
+	@printf "  $(DIM)→ this WIPES the database, removes custom images and user uploads$(RESET)\n"
 	@$(COMPOSE) down -v --rmi local
+	@printf "$(YELLOW)▼ Wiping user uploads$(RESET) $(DIM)(keeps .gitkeep)$(RESET)\n"
+	@find public/uploads/avatars public/uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
 	@printf "$(GREEN)✓ Clean slate$(RESET)\n"
 
 re: fclean build all
