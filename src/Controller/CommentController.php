@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Database;
-use App\Core\Flash;
 use App\Model\Comment;
 use App\Model\Image;
 use App\Model\User;
@@ -20,30 +19,28 @@ class CommentController
 
 	public function create(): void
 	{
-		Auth::requireAuth();
+		if (!Auth::check()) {
+			$this->jsonError(401, "Sign in required.");
+		}
 
 		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
 			? $_POST[Csrf::fieldName()]
 			: "";
 		if (!Csrf::validate($submittedToken)) {
-			Flash::set("error", "Invalid CSRF token.");
-			$this->redirectBack();
+			$this->jsonError(403, "Invalid CSRF token.");
 		}
 
 		$imageId = (int) ($_POST["image_id"] ?? 0);
 		$content = trim((string) ($_POST["content"] ?? ""));
 
 		if ($imageId <= 0) {
-			Flash::set("error", "Missing image.");
-			$this->redirectBack();
+			$this->jsonError(400, "Missing image.");
 		}
 		if ($content === "") {
-			Flash::set("error", "Comment cannot be empty.");
-			$this->redirectBack($imageId);
+			$this->jsonError(400, "Comment cannot be empty.");
 		}
 		if (mb_strlen($content) > self::CONTENT_MAX_LENGTH) {
-			Flash::set("error", "Comment is too long (max " . self::CONTENT_MAX_LENGTH . " characters).");
-			$this->redirectBack($imageId);
+			$this->jsonError(400, "Comment is too long (max " . self::CONTENT_MAX_LENGTH . " characters).");
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
@@ -52,18 +49,39 @@ class CommentController
 		$images = new Image($pdo);
 		$image  = $images->findById($imageId);
 		if ($image === null) {
-			Flash::set("error", "Image not found.");
-			$this->redirectBack();
+			$this->jsonError(404, "Image not found.");
 		}
 
 		$commenterId = (int) Auth::id();
-		(new Comment($pdo))->create($commenterId, $imageId, $content);
+		$comments    = new Comment($pdo);
+		$commentId   = $comments->create($commenterId, $imageId, $content);
 
-		Flash::set("success", "Comment posted.");
+		$row = $comments->findByIdEnriched($commentId);
+		if ($row === null) {
+			$this->jsonError(500, "Could not load created comment.");
+		}
 
 		$this->maybeSendNotification($pdo, (int) $image["user_id"], $commenterId, $imageId, $content);
 
-		$this->redirectBack($imageId);
+		$createdTs    = strtotime((string) $row["created_at"]);
+		$createdIso   = $createdTs !== false ? date("c", $createdTs) : "";
+		$createdHuman = $createdTs !== false ? date("M j, H:i", $createdTs) : "";
+
+		$this->jsonSuccess([
+			"comment" => [
+				"id"            => (int) $row["id"],
+				"image_id"      => (int) $row["image_id"],
+				"user_id"       => (int) $row["user_id"],
+				"username"      => (string) $row["username"],
+				"avatar_path"   => isset($row["avatar_path"]) ? (string) $row["avatar_path"] : "",
+				"content"       => (string) $row["content"],
+				"created_at"    => (string) $row["created_at"],
+				"created_iso"   => $createdIso,
+				"created_human" => $createdHuman,
+			],
+			"comment_count" => $comments->countByImageId($imageId),
+			"is_mine"       => true,
+		]);
 	}
 
 	private function maybeSendNotification(
@@ -86,7 +104,7 @@ class CommentController
 			return;
 		}
 
-		$commenter = $users->findById($commenterId);
+		$commenter         = $users->findById($commenterId);
 		$commenterUsername = is_array($commenter) ? (string) $commenter["username"] : "Someone";
 
 		try {
@@ -105,20 +123,20 @@ class CommentController
 
 	public function delete(): void
 	{
-		Auth::requireAuth();
+		if (!Auth::check()) {
+			$this->jsonError(401, "Sign in required.");
+		}
 
 		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
 			? $_POST[Csrf::fieldName()]
 			: "";
 		if (!Csrf::validate($submittedToken)) {
-			Flash::set("error", "Invalid CSRF token.");
-			$this->redirectBack();
+			$this->jsonError(403, "Invalid CSRF token.");
 		}
 
 		$commentId = (int) ($_POST["comment_id"] ?? 0);
 		if ($commentId <= 0) {
-			Flash::set("error", "Missing comment.");
-			$this->redirectBack();
+			$this->jsonError(400, "Missing comment.");
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
@@ -127,24 +145,39 @@ class CommentController
 		$comments = new Comment($pdo);
 		$comment  = $comments->findById($commentId);
 		if ($comment === null) {
-			Flash::set("error", "Comment not found.");
-			$this->redirectBack();
+			$this->jsonError(404, "Comment not found.");
 		}
 
 		if ((int) $comment["user_id"] !== (int) Auth::id()) {
-			Flash::set("error", "You can only delete your own comments.");
-			$this->redirectBack((int) $comment["image_id"]);
+			$this->jsonError(403, "You can only delete your own comments.");
 		}
 
-		$comments->delete($commentId);
-		Flash::set("success", "Comment deleted.");
-		$this->redirectBack((int) $comment["image_id"]);
+		if (!$comments->delete($commentId)) {
+			$this->jsonError(500, "Could not delete comment.");
+		}
+
+		$imageId = (int) $comment["image_id"];
+
+		$this->jsonSuccess([
+			"comment_id"    => $commentId,
+			"image_id"      => $imageId,
+			"comment_count" => $comments->countByImageId($imageId),
+		]);
 	}
 
-	private function redirectBack(?int $imageId = null): void
+	private function jsonError(int $status, string $message): void
 	{
-		$location = $imageId !== null ? "/image?id=" . $imageId : "/gallery";
-		header("Location: {$location}");
+		http_response_code($status);
+		header("Content-Type: application/json; charset=utf-8");
+		echo json_encode(["ok" => false, "error" => $message], JSON_THROW_ON_ERROR);
+		exit;
+	}
+
+	private function jsonSuccess(array $payload = []): void
+	{
+		http_response_code(200);
+		header("Content-Type: application/json; charset=utf-8");
+		echo json_encode(["ok" => true] + $payload, JSON_THROW_ON_ERROR);
 		exit;
 	}
 }
