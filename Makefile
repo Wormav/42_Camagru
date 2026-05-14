@@ -92,6 +92,27 @@ db:
 	@printf "$(CYAN)→ Opening MySQL shell as $$($(COMPOSE) exec -T $(DB) printenv MYSQL_USER)$(RESET)\n"
 	@$(COMPOSE) exec $(DB) sh -c 'mysql -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE"'
 
+# Fake data
+fake:
+	@if [ ! -f fake/seed.sql ]; then \
+		printf "$(RED)✗ fake/seed.sql not found — run \`make fake-snapshot\` first$(RESET)\n"; \
+		exit 1; \
+	fi
+	@printf "$(MAGENTA)▼ Restoring fake data$(RESET)\n"
+	@printf "  $(DIM)→ wiping current uploads (keeps .gitkeep)$(RESET)\n"
+	@find public/uploads/avatars public/uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
+	@printf "  $(DIM)→ copying fake/avatars + fake/snaps → public/uploads/$(RESET)\n"
+	@find fake/avatars -mindepth 1 -type f -exec cp -p {} public/uploads/avatars/ \;
+	@find fake/snaps   -mindepth 1 -type f -exec cp -p {} public/uploads/snaps/   \;
+	@printf "  $(DIM)→ truncating tables and replaying fake/seed.sql$(RESET)\n"
+	@$(COMPOSE) cp fake/seed.sql $(DB):/tmp/fake-seed.sql >/dev/null
+	@$(COMPOSE) exec -T $(DB) sh -c 'mysql -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" -e "\
+		SET FOREIGN_KEY_CHECKS=0; \
+		TRUNCATE TABLE comments; TRUNCATE TABLE likes; TRUNCATE TABLE images; TRUNCATE TABLE users; \
+		SET FOREIGN_KEY_CHECKS=1;" && \
+		mysql -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" < /tmp/fake-seed.sql' 2>&1 | grep -v "Warning" || true
+	@printf "$(GREEN)✓ Fake data restored$(RESET)  $(DIM)(see fake/README.md for credentials)$(RESET)\n"
+
 # Dev helpers
 install:
 	@printf "$(MAGENTA)▼ Installing PHP dependencies$(RESET) $(DIM)(composer)$(RESET)\n"
@@ -134,7 +155,8 @@ help: banner
 	@printf "    $(GREEN)logs$(RESET)            $(DIM)Tail container logs (db + app + web)$(RESET)\n"
 	@printf "    $(GREEN)ps$(RESET)              $(DIM)Show container status$(RESET)\n"
 	@printf "    $(GREEN)shell$(RESET)           $(DIM)Open a shell inside the PHP (app) container$(RESET)\n"
-	@printf "    $(GREEN)db$(RESET)              $(DIM)Open a MySQL shell inside the db container$(RESET)\n\n"
+	@printf "    $(GREEN)db$(RESET)              $(DIM)Open a MySQL shell inside the db container$(RESET)\n"
+	@printf "    $(GREEN)fake$(RESET)            $(DIM)Restore the demo dataset shipped in fake/$(RESET)\n\n"
 	@printf "  $(BOLD)App$(RESET)\n"
 	@printf "    $(GREEN)install$(RESET)         $(DIM)Install PHP and Node dependencies (host)$(RESET)\n"
 	@printf "    $(GREEN)serve$(RESET)           $(DIM)Run PHP built-in server on :8000 (non-docker dev)$(RESET)\n"
@@ -144,4 +166,4 @@ help: banner
 	@printf "    $(GREEN)lint$(RESET)            $(DIM)Run PHPStan static analysis$(RESET)\n\n"
 	@printf "    $(GREEN)help$(RESET)            $(DIM)Show this help$(RESET)\n\n"
 
-.PHONY: all banner build clean fclean re logs ps shell db install serve tailwind tailwind-watch fmt lint help
+.PHONY: all banner build clean fclean re logs ps shell db fake install serve tailwind tailwind-watch fmt lint help
