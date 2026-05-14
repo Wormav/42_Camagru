@@ -20,7 +20,10 @@
  * @var int       $totalPages     Total pages (at least 1).
  * @var bool      $isAuth         True if a user is currently logged in.
  * @var int|null  $currentUserId  Logged-in user id (null for visitors).
+ * @var array<int,array<int,array{id:int,image_id:int,user_id:int,content:string,created_at:string,username:string}>> $commentsByImage
  */
+
+use App\Core\Csrf;
 
 $pageUrl = static function (int $n): string {
 	return "/gallery?page=" . $n;
@@ -92,7 +95,7 @@ $pages = $paginationWindow($page, $totalPages);
 				$createdHuman = $createdTs !== false ? date("M j, Y", $createdTs) : "";
 				$createdIso   = $createdTs !== false ? date("c", $createdTs) : "";
 				?>
-				<li>
+				<li id="image-<?= $e((int) $item["id"]) ?>">
 					<figure class="brutal-card bg-paper !p-0 overflow-hidden flex flex-col h-full">
 						<div class="aspect-square w-full bg-ink border-b-3 border-ink overflow-hidden">
 							<img
@@ -154,6 +157,66 @@ $pages = $paginationWindow($page, $totalPages);
 									<?= $e((int) $item["comment_count"]) ?>
 								</span>
 							</div>
+
+							<?php
+							$imageComments = $commentsByImage[(int) $item["id"]] ?? [];
+							?>
+							<section class="border-t-3 border-ink p-4 sm:p-5 flex flex-col gap-3 bg-white">
+								<p class="brutal-label !mb-0">Comments</p>
+
+								<?php if ($imageComments === []): ?>
+									<p class="font-mono text-xs opacity-60">// no comments yet.</p>
+								<?php else: ?>
+									<ul class="flex flex-col gap-3 max-h-56 overflow-y-auto pr-1">
+										<?php foreach ($imageComments as $comment): ?>
+											<?php
+											$cTs   = strtotime((string) $comment["created_at"]);
+											$cIso  = $cTs !== false ? date("c",       $cTs) : "";
+											$cHuman = $cTs !== false ? date("M j, H:i", $cTs) : "";
+											?>
+											<li class="border-3 border-ink bg-paper p-3 shadow-brutal-sm">
+												<div class="flex items-center justify-between gap-2 mb-1">
+													<p class="font-display font-black text-xs uppercase truncate">
+														@<?= $e($comment["username"]) ?>
+													</p>
+													<?php if ($cIso !== ""): ?>
+														<time datetime="<?= $e($cIso) ?>" class="font-mono text-[0.65rem] uppercase tracking-wider opacity-60 shrink-0">
+															<?= $e($cHuman) ?>
+														</time>
+													<?php endif; ?>
+												</div>
+												<p class="font-sans text-sm whitespace-pre-wrap break-words">
+													<?= $e($comment["content"]) ?>
+												</p>
+											</li>
+										<?php endforeach; ?>
+									</ul>
+								<?php endif; ?>
+
+								<?php if ($isAuth): ?>
+									<form method="POST" action="/comments" class="flex flex-col gap-2">
+										<?= Csrf::field() ?>
+										<input type="hidden" name="image_id" value="<?= $e((int) $item["id"]) ?>">
+										<label class="sr-only" for="comment-<?= $e((int) $item["id"]) ?>">Add a comment</label>
+										<textarea
+											id="comment-<?= $e((int) $item["id"]) ?>"
+											name="content"
+											rows="2"
+											maxlength="500"
+											required
+											placeholder="Drop a comment…"
+											class="brutal-input w-full resize-y text-sm"
+										></textarea>
+										<button type="submit" class="btn-brutal btn-brutal--cyan !py-2 text-sm self-end">
+											Post
+										</button>
+									</form>
+								<?php else: ?>
+									<a href="/login" class="font-mono text-xs uppercase tracking-wider opacity-70 hover:opacity-100 hover:underline decoration-3 underline-offset-4">
+										// sign in to comment →
+									</a>
+								<?php endif; ?>
+							</section>
 						</figcaption>
 					</figure>
 				</li>

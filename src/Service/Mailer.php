@@ -27,6 +27,27 @@ class Mailer
 		return $this->send($email, $subject, $body);
 	}
 
+	public function sendCommentNotification(
+		string $authorEmail,
+		string $authorUsername,
+		string $commenterUsername,
+		string $commentContent,
+		int $imageId
+	): bool {
+		$link    = $this->buildUrl("/gallery", ["image" => $imageId]);
+		$subject = "{$commenterUsername} commented on your snap";
+
+		$body  = "Hello {$authorUsername},\n\n";
+		$body .= "{$commenterUsername} just commented on one of your snaps:\n\n";
+		$body .= "\"{$commentContent}\"\n\n";
+		$body .= "See it on Camagru:\n";
+		$body .= $link . "\n\n";
+		$body .= "You can disable these notifications from your profile preferences.\n\n";
+		$body .= "— The Camagru Team";
+
+		return $this->send($authorEmail, $subject, $body);
+	}
+
 	public function sendPasswordReset(string $email, string $username, string $token): bool
 	{
 		$link    = $this->buildUrl("/reset/confirm", ["token" => $token]);

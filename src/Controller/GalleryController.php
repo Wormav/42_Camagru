@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Core\Auth;
 use App\Core\Database;
+use App\Model\Comment;
 use App\Model\Image;
 use App\View\View;
 
@@ -34,16 +35,23 @@ class GalleryController
 		$currentUserId = Auth::id();
 		$items         = $images->findFeed(self::PER_PAGE, $offset, $currentUserId);
 
+		$comments  = new Comment($pdo);
+		$commentsByImage = [];
+		foreach ($items as $item) {
+			$commentsByImage[(int) $item["id"]] = $comments->findByImageId((int) $item["id"]);
+		}
+
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/gallery", [
-			"title"         => "Gallery",
-			"scripts"       => ["/js/gallery.js"],
-			"items"         => $items,
-			"total"         => $total,
-			"page"          => $page,
-			"totalPages"    => $totalPages,
-			"isAuth"        => Auth::check(),
-			"currentUserId" => $currentUserId,
+			"title"           => "Gallery",
+			"scripts"         => ["/js/gallery.js"],
+			"items"           => $items,
+			"commentsByImage" => $commentsByImage,
+			"total"           => $total,
+			"page"            => $page,
+			"totalPages"      => $totalPages,
+			"isAuth"          => Auth::check(),
+			"currentUserId"   => $currentUserId,
 		]);
 	}
 
