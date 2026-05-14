@@ -37,6 +37,7 @@ class GalleryController
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/gallery", [
 			"title"         => "Gallery",
+			"scripts"       => ["/js/gallery.js"],
 			"items"         => $items,
 			"total"         => $total,
 			"page"          => $page,
