@@ -11,9 +11,19 @@ use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Flash;
 
+$currentPath = parse_url($_SERVER["REQUEST_URI"] ?? "/", PHP_URL_PATH) ?: "/";
+
 $navItems = [
-	["label" => "Gallery", "href" => "/gallery"],
-	["label" => "Post",    "href" => "/post"],
+	[
+		"label"  => "Gallery",
+		"href"   => "/gallery",
+		"active" => $currentPath === "/gallery" || str_starts_with($currentPath, "/image"),
+	],
+	[
+		"label"  => "Post",
+		"href"   => "/post",
+		"active" => $currentPath === "/post",
+	],
 ];
 
 $isAuth     = Auth::check();
@@ -61,7 +71,11 @@ $flashError   = Flash::get("error");
 		<!-- Desktop center nav -->
 		<nav class="hidden md:flex items-center gap-2">
 			<?php foreach ($navItems as $item): ?>
-				<a href="<?= $e($item["href"]) ?>" class="px-3 py-1.5 font-display font-bold text-sm uppercase border-3 border-transparent hover:border-ink hover:bg-cyan transition-all">
+				<a
+					href="<?= $e($item["href"]) ?>"
+					<?= $item["active"] ? 'aria-current="page"' : "" ?>
+					class="px-3 py-1.5 font-display font-bold text-sm uppercase border-3 transition-all <?= $item["active"] ? "border-ink bg-lime" : "border-transparent hover:border-ink hover:bg-cyan" ?>"
+				>
 					<?= $e($item["label"]) ?>
 				</a>
 			<?php endforeach; ?>
@@ -111,7 +125,11 @@ $flashError   = Flash::get("error");
 			<!-- Full-bleed mobile drawer -->
 			<div class="fixed inset-x-0 top-[5rem] bg-paper border-b-3 border-ink shadow-brutal-sm px-4 sm:px-6 py-5 flex flex-col gap-2 z-30">
 				<?php foreach ($navItems as $item): ?>
-					<a href="<?= $e($item["href"]) ?>" class="block px-3 py-2 font-display font-bold text-sm uppercase border-3 border-ink hover:bg-cyan transition-colors">
+					<a
+						href="<?= $e($item["href"]) ?>"
+						<?= $item["active"] ? 'aria-current="page"' : "" ?>
+						class="block px-3 py-2 font-display font-bold text-sm uppercase border-3 border-ink transition-colors <?= $item["active"] ? "bg-lime" : "hover:bg-cyan" ?>"
+					>
 						<?= $e($item["label"]) ?>
 					</a>
 				<?php endforeach; ?>
