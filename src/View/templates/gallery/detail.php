@@ -53,9 +53,19 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 
 			<div class="p-5 sm:p-6 flex flex-col gap-4">
 				<div class="flex items-center justify-between gap-3">
-					<p class="font-display font-black text-lg uppercase truncate">
-						@<?= $e($item["username"]) ?>
-					</p>
+					<div class="flex items-center gap-3 min-w-0 flex-1">
+						<?php $authorAvatar = $item["avatar_path"] ?? null; ?>
+						<?php if (is_string($authorAvatar) && $authorAvatar !== ""): ?>
+							<img src="<?= $e($authorAvatar) ?>" alt="" loading="lazy" class="w-12 h-12 object-cover border-3 border-ink shadow-brutal-sm shrink-0">
+						<?php else: ?>
+							<div class="w-12 h-12 flex items-center justify-center bg-cyan border-3 border-ink shadow-brutal-sm font-display font-black text-lg uppercase shrink-0">
+								<?= $e(mb_substr((string) $item["username"], 0, 1)) ?>
+							</div>
+						<?php endif; ?>
+						<p class="font-display font-black text-lg uppercase truncate">
+							@<?= $e($item["username"]) ?>
+						</p>
+					</div>
 					<?php if ($createdIso !== ""): ?>
 						<time datetime="<?= $e($createdIso) ?>" class="font-mono text-xs uppercase tracking-wider opacity-60 shrink-0">
 							<?= $e($createdHuman) ?>
@@ -128,9 +138,19 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 						?>
 						<li class="border-3 border-ink bg-paper p-3 shadow-brutal-sm">
 							<div class="flex items-center justify-between gap-2 mb-1.5">
-								<p class="font-display font-black text-xs uppercase truncate flex-1 min-w-0">
-									@<?= $e($comment["username"]) ?>
-								</p>
+								<div class="flex items-center gap-2 flex-1 min-w-0">
+									<?php $commenterAvatar = $comment["avatar_path"] ?? null; ?>
+									<?php if (is_string($commenterAvatar) && $commenterAvatar !== ""): ?>
+										<img src="<?= $e($commenterAvatar) ?>" alt="" loading="lazy" class="w-7 h-7 object-cover border-2 border-ink shrink-0">
+									<?php else: ?>
+										<div class="w-7 h-7 flex items-center justify-center bg-cyan border-2 border-ink font-display font-black text-[0.65rem] uppercase shrink-0">
+											<?= $e(mb_substr((string) $comment["username"], 0, 1)) ?>
+										</div>
+									<?php endif; ?>
+									<p class="font-display font-black text-xs uppercase truncate min-w-0">
+										@<?= $e($comment["username"]) ?>
+									</p>
+								</div>
 
 								<div class="flex items-center gap-2 shrink-0">
 									<?php if ($cIso !== ""): ?>

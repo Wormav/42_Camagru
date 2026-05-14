@@ -300,6 +300,71 @@
 		lightboxImage.src = "";
 	};
 
+	const removeSnap = (figure) => {
+		figure.remove();
+
+		if (snapsCount !== null) {
+			const current = Number.parseInt(snapsCount.textContent ?? "0", 10);
+			const next = Number.isNaN(current) ? 0 : Math.max(0, current - 1);
+			snapsCount.textContent = String(next);
+
+			// Re-show empty state when the last snap is gone.
+			if (next === 0) {
+				if (snapsList !== null) {
+					snapsList.classList.add("hidden");
+				}
+				if (snapsEmpty !== null) {
+					snapsEmpty.classList.remove("hidden");
+				}
+			}
+		}
+	};
+
+	const deleteSnap = async (figure, button) => {
+		const imageId = Number.parseInt(figure.dataset.imageId ?? "", 10);
+		if (Number.isNaN(imageId) || imageId <= 0) {
+			return;
+		}
+
+		if (!window.confirm("Delete this snap? This cannot be undone.")) {
+			return;
+		}
+
+		button.setAttribute("disabled", "");
+		button.setAttribute("aria-disabled", "true");
+
+		try {
+			const formData = new FormData();
+			formData.append("csrf_token", getCsrfToken());
+			formData.append("image_id", String(imageId));
+
+			const response = await fetch("/post/delete", {
+				method: "POST",
+				body: formData,
+				credentials: "same-origin",
+			});
+
+			const payload = await response.json().catch(() => ({}));
+
+			if (!response.ok || payload.ok !== true) {
+				const message =
+					typeof payload.error === "string" ? payload.error : `Delete failed (${response.status}).`;
+				toast(message, "error");
+				button.removeAttribute("disabled");
+				button.setAttribute("aria-disabled", "false");
+				return;
+			}
+
+			removeSnap(figure);
+			toast("Snap deleted ✓");
+		} catch (error) {
+			console.warn("[post] delete failed:", error);
+			toast("Network error — please try again.", "error");
+			button.removeAttribute("disabled");
+			button.setAttribute("aria-disabled", "false");
+		}
+	};
+
 	// Delegated click handler — works for current snaps AND newly prepended ones.
 	if (snapsList !== null) {
 		snapsList.addEventListener("click", (event) => {
@@ -307,6 +372,16 @@
 			if (!(target instanceof Element)) {
 				return;
 			}
+
+			const deleteBtn = target.closest("[data-action='delete-snap']");
+			if (deleteBtn instanceof HTMLElement && snapsList.contains(deleteBtn)) {
+				const figure = deleteBtn.closest("[data-snap-item]");
+				if (figure instanceof HTMLElement) {
+					deleteSnap(figure, deleteBtn);
+				}
+				return;
+			}
+
 			const trigger = target.closest("[data-action='open-lightbox']");
 			if (!(trigger instanceof HTMLElement) || !snapsList.contains(trigger)) {
 				return;
