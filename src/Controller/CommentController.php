@@ -103,12 +103,47 @@ class CommentController
 		}
 	}
 
+	public function delete(): void
+	{
+		Auth::requireAuth();
+
+		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
+			? $_POST[Csrf::fieldName()]
+			: "";
+		if (!Csrf::validate($submittedToken)) {
+			Flash::set("error", "Invalid CSRF token.");
+			$this->redirectBack();
+		}
+
+		$commentId = (int) ($_POST["comment_id"] ?? 0);
+		if ($commentId <= 0) {
+			Flash::set("error", "Missing comment.");
+			$this->redirectBack();
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+
+		$comments = new Comment($pdo);
+		$comment  = $comments->findById($commentId);
+		if ($comment === null) {
+			Flash::set("error", "Comment not found.");
+			$this->redirectBack();
+		}
+
+		if ((int) $comment["user_id"] !== (int) Auth::id()) {
+			Flash::set("error", "You can only delete your own comments.");
+			$this->redirectBack((int) $comment["image_id"]);
+		}
+
+		$comments->delete($commentId);
+		Flash::set("success", "Comment deleted.");
+		$this->redirectBack((int) $comment["image_id"]);
+	}
+
 	private function redirectBack(?int $imageId = null): void
 	{
-		$location = "/gallery";
-		if ($imageId !== null) {
-			$location .= "#image-" . $imageId;
-		}
+		$location = $imageId !== null ? "/image?id=" . $imageId : "/gallery";
 		header("Location: {$location}");
 		exit;
 	}

@@ -49,10 +49,12 @@ $router->post("/profile/password", [ProfileController::class, "updatePassword"])
 $router->post("/profile/notifications", [ProfileController::class, "updateNotifications"]);
 $router->post("/profile/avatar", [ProfileController::class, "updateAvatar"]);
 $router->get("/gallery", [GalleryController::class, "showGallery"]);
+$router->get("/image", [GalleryController::class, "showImage"]);
 $router->get("/post", [PostController::class, "showPost"]);
 $router->post("/post/capture", [PostController::class, "capture"]);
 $router->post("/post/delete", [PostController::class, "delete"]);
 $router->post("/likes/toggle", [LikeController::class, "toggle"]);
 $router->post("/comments", [CommentController::class, "create"]);
+$router->post("/comments/delete", [CommentController::class, "delete"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);

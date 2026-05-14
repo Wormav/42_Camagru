@@ -42,6 +42,25 @@ class Comment
 		return $stmt->fetchAll();
 	}
 
+	public function findById(int $id): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			"SELECT id, image_id, user_id, content, created_at
+			 FROM comments
+			 WHERE id = :id LIMIT 1"
+		);
+		$stmt->execute([":id" => $id]);
+		$row = $stmt->fetch();
+		return $row !== false ? $row : null;
+	}
+
+	public function delete(int $id): bool
+	{
+		$stmt = $this->pdo->prepare("DELETE FROM comments WHERE id = :id");
+		$stmt->execute([":id" => $id]);
+		return $stmt->rowCount() === 1;
+	}
+
 	public function countByImageId(int $imageId): int
 	{
 		$stmt = $this->pdo->prepare(

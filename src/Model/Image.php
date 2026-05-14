@@ -87,6 +87,31 @@ class Image
 		return $stmt->fetchAll();
 	}
 
+	public function findOneEnriched(int $imageId, ?int $currentUserId = null): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			"SELECT images.id, images.user_id, images.image_path, images.overlay_used, images.created_at, users.username,
+			COUNT(DISTINCT likes.id) AS like_count,
+			COUNT(DISTINCT comments.id) AS comment_count,
+			EXISTS (
+				SELECT 1 FROM likes AS l
+				WHERE l.image_id = images.id AND l.user_id = :current_user_id
+			) AS user_has_liked
+			FROM images
+			JOIN users ON images.user_id = users.id
+			LEFT JOIN likes ON images.id = likes.image_id
+			LEFT JOIN comments ON images.id = comments.image_id
+			WHERE images.id = :image_id
+			GROUP BY images.id
+			LIMIT 1"
+		);
+		$stmt->bindValue(":current_user_id", $currentUserId ?? 0, PDO::PARAM_INT);
+		$stmt->bindValue(":image_id", $imageId, PDO::PARAM_INT);
+		$stmt->execute();
+		$row = $stmt->fetch();
+		return $row !== false ? $row : null;
+	}
+
 	public function countAll(): int
 	{
 		$stmt = $this->pdo->query("SELECT COUNT(*) FROM images");
