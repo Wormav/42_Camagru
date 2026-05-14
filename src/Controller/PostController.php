@@ -29,7 +29,7 @@ class PostController
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("post/post", [
 			"title"    => "Post",
-			"scripts"  => ["/js/post.js"],
+			"scripts"  => ["/dist/post.bundle.js"],
 			"overlays" => $overlays,
 			"userImages" => $userImages,
 		]);

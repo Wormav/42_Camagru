@@ -16,6 +16,8 @@ RESET   := \033[0m
 
 .DEFAULT_GOAL := all
 
+JS_BUNDLES := toast gallery post register
+
 define BANNER
 
   ██████╗ █████╗ ███╗   ███╗ █████╗  ██████╗ ██████╗ ██╗   ██╗
@@ -36,7 +38,7 @@ banner:
 	@echo "$$BANNER"
 	@printf "$(RESET)"
 
-all: banner tailwind
+all: banner tailwind js
 	@printf $(SEP)"\n"
 	@printf "$(MAGENTA)[1/3]$(RESET) $(BOLD)Building images (if needed)$(RESET)\n"
 	@printf "      $(DIM)→ $(COMPOSE) build$(RESET)\n"
@@ -134,6 +136,18 @@ tailwind-watch:
 	@printf "$(CYAN)→ Watching CSS$(RESET) $(DIM)(Ctrl+C to stop)$(RESET)\n"
 	@npx tailwindcss -i assets/input.css -o public/style.css --watch
 
+js:
+	@printf "$(CYAN)→ Building JS bundles$(RESET) $(DIM)(concat js/shared + js/<bundle>)$(RESET)\n"
+	@mkdir -p public/dist
+	@for bundle in $(JS_BUNDLES); do \
+		out=public/dist/$$bundle.bundle.js; \
+		: > $$out; \
+		for src in js/shared/*.js js/$$bundle/*.js; do \
+			[ -f "$$src" ] && cat "$$src" >> $$out && printf "\n" >> $$out; \
+		done; \
+		printf "  $(GREEN)✓$(RESET) $$out\n"; \
+	done
+
 fmt:
 	@printf "$(MAGENTA)▼ Formatting PHP$(RESET) $(DIM)(php-cs-fixer, PSR-12)$(RESET)\n"
 	@vendor/bin/php-cs-fixer fix
@@ -162,8 +176,9 @@ help: banner
 	@printf "    $(GREEN)serve$(RESET)           $(DIM)Run PHP built-in server on :8000 (non-docker dev)$(RESET)\n"
 	@printf "    $(GREEN)tailwind$(RESET)        $(DIM)Build minified public/style.css$(RESET)\n"
 	@printf "    $(GREEN)tailwind-watch$(RESET)  $(DIM)Watch and rebuild CSS on change$(RESET)\n"
+	@printf "    $(GREEN)js$(RESET)              $(DIM)Concat js/<bundle>/*.js into public/dist/<bundle>.bundle.js$(RESET)\n"
 	@printf "    $(GREEN)fmt$(RESET)             $(DIM)Format PHP (PSR-12)$(RESET)\n"
 	@printf "    $(GREEN)lint$(RESET)            $(DIM)Run PHPStan static analysis$(RESET)\n\n"
 	@printf "    $(GREEN)help$(RESET)            $(DIM)Show this help$(RESET)\n\n"
 
-.PHONY: all banner build clean fclean re logs ps shell db fake install serve tailwind tailwind-watch fmt lint help
+.PHONY: all banner build clean fclean re logs ps shell db fake install serve tailwind tailwind-watch js fmt lint help

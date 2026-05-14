@@ -38,7 +38,7 @@ class GalleryController
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/gallery", [
 			"title"         => "Gallery",
-			"scripts"       => ["/js/gallery.js"],
+			"scripts"       => ["/dist/gallery.bundle.js"],
 			"items"         => $items,
 			"total"         => $total,
 			"page"          => $page,
@@ -73,7 +73,7 @@ class GalleryController
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/detail", [
 			"title"         => "Snap by @" . $item["username"],
-			"scripts"       => ["/js/gallery.js"],
+			"scripts"       => ["/dist/gallery.bundle.js"],
 			"item"          => $item,
 			"comments"      => $comments,
 			"isAuth"        => Auth::check(),

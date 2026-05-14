@@ -45,7 +45,7 @@ $flashError   = Flash::get("error");
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="/style.css">
-	<script src="/js/toast.js" defer></script>
+	<script src="/dist/toast.bundle.js" defer></script>
 	<?php foreach (($scripts ?? []) as $scriptSrc): ?>
     	<script src="<?= $e($scriptSrc) ?>" defer></script>
     <?php endforeach; ?>
