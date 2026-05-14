@@ -22,9 +22,22 @@ use App\Controller\PostController;
 use App\Controller\ProfileController;
 use App\Core\Env;
 use App\Core\Router;
+use App\Core\SecurityHeaders;
 use App\Core\Session;
 
 Env::load(__DIR__ . "/../.env");
+
+$appEnv = Env::get("APP_ENV", "production");
+error_reporting(E_ALL);
+if ($appEnv === "development") {
+	ini_set("display_errors", "1");
+} else {
+	ini_set("display_errors", "0");
+	ini_set("log_errors", "1");
+}
+
+SecurityHeaders::send();
+
 Session::start();
 
 $router = new Router();
