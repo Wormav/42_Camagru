@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\Auth;
 use App\Core\Database;
 use App\Model\Image;
 use App\View\View;
@@ -29,16 +30,19 @@ class GalleryController
 			$page = $totalPages;
 		}
 
-		$offset = ($page - 1) * self::PER_PAGE;
-		$items  = $images->findFeed(self::PER_PAGE, $offset);
+		$offset        = ($page - 1) * self::PER_PAGE;
+		$currentUserId = Auth::id();
+		$items         = $images->findFeed(self::PER_PAGE, $offset, $currentUserId);
 
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/gallery", [
-			"title"      => "Gallery",
-			"items"      => $items,
-			"total"      => $total,
-			"page"       => $page,
-			"totalPages" => $totalPages,
+			"title"         => "Gallery",
+			"items"         => $items,
+			"total"         => $total,
+			"page"          => $page,
+			"totalPages"    => $totalPages,
+			"isAuth"        => Auth::check(),
+			"currentUserId" => $currentUserId,
 		]);
 	}
 
