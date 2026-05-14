@@ -24,7 +24,7 @@
 
 		<!-- Left: copy + CTA -->
 		<div class="lg:col-span-7 flex flex-col gap-6 animate-rise">
-			<span class="brutal-tag bg-cyan self-start">// version 4.1 · server-side merge</span>
+			<span class="brutal-tag bg-cyan self-start">// 42 project</span>
 
 			<h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight uppercase">
 				Snap it.
@@ -34,7 +34,7 @@
 			</h1>
 
 			<p class="font-sans text-lg sm:text-xl max-w-xl">
-				A photo booth that takes your webcam, slaps a sticker on top, and hands you a snap good enough to print on a t-shirt. Built from scratch in PHP and vanilla JS, like in the good old days.
+				A photo booth that takes your webcam, slaps a sticker on top, and hands you a snap good enough to print on a t-shirt. Built from scratch in PHP, like in the good old days.
 			</p>
 
 			<div class="flex flex-wrap items-center gap-3 mt-2">

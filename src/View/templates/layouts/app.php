@@ -230,14 +230,6 @@ $flashError   = Flash::get("error");
 			<ul class="space-y-2 text-sm font-medium text-paper/70">
 				<?php if ($isAuth): ?>
 					<li><a href="/profile" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Profile</a></li>
-					<li>
-						<form method="POST" action="/logout" class="inline">
-							<?= Csrf::field() ?>
-							<button type="submit" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">
-								Sign out
-							</button>
-						</form>
-					</li>
 				<?php else: ?>
 					<li><a href="/login" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Sign in</a></li>
 					<li><a href="/reset" class="hover:text-lime hover:underline decoration-3 underline-offset-4 transition-colors">Reset password</a></li>
