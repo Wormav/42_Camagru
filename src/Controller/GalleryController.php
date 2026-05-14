@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Core\Auth;
 use App\Core\Database;
+use App\Model\Comment;
 use App\Model\Image;
 use App\View\View;
 
@@ -29,17 +31,53 @@ class GalleryController
 			$page = $totalPages;
 		}
 
-		$offset = ($page - 1) * self::PER_PAGE;
-		$items  = $images->findFeed(self::PER_PAGE, $offset);
+		$offset        = ($page - 1) * self::PER_PAGE;
+		$currentUserId = Auth::id();
+		$items         = $images->findFeed(self::PER_PAGE, $offset, $currentUserId);
 
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/gallery", [
-			"title"      => "Gallery",
-			"items"      => $items,
-			"total"      => $total,
-			"page"       => $page,
-			"totalPages" => $totalPages,
+			"title"         => "Gallery",
+			"scripts"       => ["/js/gallery.js"],
+			"items"         => $items,
+			"total"         => $total,
+			"page"          => $page,
+			"totalPages"    => $totalPages,
+			"isAuth"        => Auth::check(),
+			"currentUserId" => $currentUserId,
 		]);
 	}
 
+	public function showImage(): void
+	{
+		$imageId = (int) ($_GET["id"] ?? 0);
+		if ($imageId <= 0) {
+			header("Location: /gallery");
+			exit;
+		}
+
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+
+		$currentUserId = Auth::id();
+		$images        = new Image($pdo);
+
+		$item = $images->findOneEnriched($imageId, $currentUserId);
+		if ($item === null) {
+			header("Location: /gallery");
+			exit;
+		}
+
+		$comments = (new Comment($pdo))->findByImageId($imageId);
+
+		$view = new View(__DIR__ . "/../View/templates");
+		$view->render("gallery/detail", [
+			"title"         => "Snap by @" . $item["username"],
+			"scripts"       => ["/js/gallery.js"],
+			"item"          => $item,
+			"comments"      => $comments,
+			"isAuth"        => Auth::check(),
+			"currentUserId" => $currentUserId,
+		]);
+	}
 }
