@@ -102,7 +102,7 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true">
 							<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
 						</svg>
-						<?= $e((int) $item["comment_count"]) ?>
+						<span data-comment-count><?= $e((int) $item["comment_count"]) ?></span>
 					</span>
 				</div>
 			</div>
@@ -113,82 +113,81 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 
 			<div class="flex items-center justify-between gap-3">
 				<p class="font-display font-black text-sm uppercase">Comments</p>
-				<span class="brutal-tag bg-cyan"><?= $e((int) $item["comment_count"]) ?></span>
+				<span class="brutal-tag bg-cyan" data-comment-count><?= $e((int) $item["comment_count"]) ?></span>
 			</div>
 
-			<?php if ($comments === []): ?>
+			<div
+				class="border-3 border-ink bg-paper p-6 text-center<?= $comments === [] ? "" : " hidden" ?>"
+				data-comments-empty
+			>
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 mx-auto opacity-60" aria-hidden="true">
+					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+				</svg>
+				<p class="mt-3 font-display font-black text-sm uppercase">No comments yet</p>
+				<p class="mt-2 font-mono text-xs opacity-60">// be the first.</p>
+			</div>
 
-				<div class="border-3 border-ink bg-paper p-6 text-center">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 mx-auto opacity-60" aria-hidden="true">
-						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-					</svg>
-					<p class="mt-3 font-display font-black text-sm uppercase">No comments yet</p>
-					<p class="mt-2 font-mono text-xs opacity-60">// be the first.</p>
-				</div>
-
-			<?php else: ?>
-
-				<ul class="flex flex-col gap-3 overflow-y-auto pr-1 flex-1 min-h-0">
-					<?php foreach ($comments as $comment): ?>
-						<?php
-						$cTs    = strtotime((string) $comment["created_at"]);
-						$cIso   = $cTs !== false ? date("c",          $cTs) : "";
-						$cHuman = $cTs !== false ? date("M j, H:i",   $cTs) : "";
-						$isMine = $isAuth && $currentUserId !== null && (int) $comment["user_id"] === $currentUserId;
-						?>
-						<li class="border-3 border-ink bg-paper p-3 shadow-brutal-sm">
-							<div class="flex items-center justify-between gap-2 mb-1.5">
-								<div class="flex items-center gap-2 flex-1 min-w-0">
-									<?php $commenterAvatar = $comment["avatar_path"] ?? null; ?>
-									<?php if (is_string($commenterAvatar) && $commenterAvatar !== ""): ?>
-										<img src="<?= $e($commenterAvatar) ?>" alt="" loading="lazy" class="w-7 h-7 object-cover border-2 border-ink shrink-0">
-									<?php else: ?>
-										<div class="w-7 h-7 flex items-center justify-center bg-cyan border-2 border-ink font-display font-black text-[0.65rem] uppercase shrink-0">
-											<?= $e(mb_substr((string) $comment["username"], 0, 1)) ?>
-										</div>
-									<?php endif; ?>
-									<p class="font-display font-black text-xs uppercase truncate min-w-0">
-										@<?= $e($comment["username"]) ?>
-									</p>
-								</div>
-
-								<div class="flex items-center gap-2 shrink-0">
-									<?php if ($cIso !== ""): ?>
-										<time datetime="<?= $e($cIso) ?>" class="font-mono text-[0.65rem] uppercase tracking-wider opacity-60">
-											<?= $e($cHuman) ?>
-										</time>
-									<?php endif; ?>
-
-									<?php if ($isMine): ?>
-										<form method="POST" action="/comments/delete">
-											<?= Csrf::field() ?>
-											<input type="hidden" name="comment_id" value="<?= $e((int) $comment["id"]) ?>">
-											<button
-												type="submit"
-												class="w-5 h-5 flex items-center justify-center border-2 border-ink bg-coral hover:bg-red transition-colors text-paper opacity-70 hover:opacity-100"
-												aria-label="Delete comment"
-												title="Delete"
-												onclick="return confirm('Delete this comment?');"
-											>
-												<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3" aria-hidden="true">
-													<line x1="18" y1="6" x2="6" y2="18"/>
-													<line x1="6" y1="6" x2="18" y2="18"/>
-												</svg>
-											</button>
-										</form>
-									<?php endif; ?>
-								</div>
+			<ul
+				class="flex flex-col gap-3 overflow-y-auto pr-1 flex-1 min-h-0<?= $comments === [] ? " hidden" : "" ?>"
+				data-comments-list
+			>
+				<?php foreach ($comments as $comment): ?>
+					<?php
+					$cTs    = strtotime((string) $comment["created_at"]);
+					$cIso   = $cTs !== false ? date("c",          $cTs) : "";
+					$cHuman = $cTs !== false ? date("M j, H:i",   $cTs) : "";
+					$isMine = $isAuth && $currentUserId !== null && (int) $comment["user_id"] === $currentUserId;
+					?>
+					<li class="border-3 border-ink bg-paper p-3 shadow-brutal-sm" data-comment-item data-comment-id="<?= $e((int) $comment["id"]) ?>">
+						<div class="flex items-center justify-between gap-2 mb-1.5">
+							<div class="flex items-center gap-2 flex-1 min-w-0">
+								<?php $commenterAvatar = $comment["avatar_path"] ?? null; ?>
+								<?php if (is_string($commenterAvatar) && $commenterAvatar !== ""): ?>
+									<img src="<?= $e($commenterAvatar) ?>" alt="" loading="lazy" class="w-7 h-7 object-cover border-2 border-ink shrink-0">
+								<?php else: ?>
+									<div class="w-7 h-7 flex items-center justify-center bg-cyan border-2 border-ink font-display font-black text-[0.65rem] uppercase shrink-0">
+										<?= $e(mb_substr((string) $comment["username"], 0, 1)) ?>
+									</div>
+								<?php endif; ?>
+								<p class="font-display font-black text-xs uppercase truncate min-w-0">
+									@<?= $e($comment["username"]) ?>
+								</p>
 							</div>
 
-							<p class="font-sans text-sm whitespace-pre-wrap break-words"><?= $e(trim((string) $comment["content"])) ?></p>
-						</li>
-					<?php endforeach; ?>
-				</ul>
+							<div class="flex items-center gap-2 shrink-0">
+								<?php if ($cIso !== ""): ?>
+									<time datetime="<?= $e($cIso) ?>" class="font-mono text-[0.65rem] uppercase tracking-wider opacity-60">
+										<?= $e($cHuman) ?>
+									</time>
+								<?php endif; ?>
 
-			<?php endif; ?>
+								<?php if ($isMine): ?>
+									<form method="POST" action="/comments/delete" data-delete-comment-form>
+										<?= Csrf::field() ?>
+										<input type="hidden" name="comment_id" value="<?= $e((int) $comment["id"]) ?>">
+										<button
+											type="submit"
+											class="w-5 h-5 flex items-center justify-center border-2 border-ink bg-coral hover:bg-red transition-colors text-paper opacity-70 hover:opacity-100"
+											aria-label="Delete comment"
+											title="Delete"
+										>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3" aria-hidden="true">
+												<line x1="18" y1="6" x2="6" y2="18"/>
+												<line x1="6" y1="6" x2="18" y2="18"/>
+											</svg>
+										</button>
+									</form>
+								<?php endif; ?>
+							</div>
+						</div>
+
+						<p class="font-sans text-sm whitespace-pre-wrap break-words"><?= $e(trim((string) $comment["content"])) ?></p>
+					</li>
+				<?php endforeach; ?>
+			</ul>
 
 			<?php if ($isAuth): ?>
-				<form method="POST" action="/comments" class="flex flex-col gap-2">
+				<form method="POST" action="/comments" class="flex flex-col gap-2" data-comment-form>
 					<?= Csrf::field() ?>
 					<input type="hidden" name="image_id" value="<?= $e((int) $item["id"]) ?>">
 					<label class="sr-only" for="comment-input">Add a comment</label>
@@ -212,4 +211,42 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 			<?php endif; ?>
 		</aside>
 	</div>
+
+	<?php if ($isAuth): ?>
+		<template data-comment-template>
+			<li class="border-3 border-ink bg-paper p-3 shadow-brutal-sm" data-comment-item>
+				<div class="flex items-center justify-between gap-2 mb-1.5">
+					<div class="flex items-center gap-2 flex-1 min-w-0">
+						<img data-tpl-avatar alt="" loading="lazy" class="w-7 h-7 object-cover border-2 border-ink shrink-0 hidden">
+						<div data-tpl-avatar-fallback class="w-7 h-7 flex items-center justify-center bg-cyan border-2 border-ink font-display font-black text-[0.65rem] uppercase shrink-0"></div>
+						<p class="font-display font-black text-xs uppercase truncate min-w-0">
+							@<span data-tpl-username></span>
+						</p>
+					</div>
+
+					<div class="flex items-center gap-2 shrink-0">
+						<time data-tpl-time class="font-mono text-[0.65rem] uppercase tracking-wider opacity-60"></time>
+
+						<form method="POST" action="/comments/delete" data-delete-comment-form data-tpl-delete>
+							<input type="hidden" name="csrf_token" data-tpl-csrf>
+							<input type="hidden" name="comment_id" data-tpl-comment-id>
+							<button
+								type="submit"
+								class="w-5 h-5 flex items-center justify-center border-2 border-ink bg-coral hover:bg-red transition-colors text-paper opacity-70 hover:opacity-100"
+								aria-label="Delete comment"
+								title="Delete"
+							>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3" aria-hidden="true">
+									<line x1="18" y1="6" x2="6" y2="18"/>
+									<line x1="6" y1="6" x2="18" y2="18"/>
+								</svg>
+							</button>
+						</form>
+					</div>
+				</div>
+
+				<p data-tpl-content class="font-sans text-sm whitespace-pre-wrap break-words"></p>
+			</li>
+		</template>
+	<?php endif; ?>
 </section>

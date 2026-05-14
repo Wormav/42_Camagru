@@ -54,6 +54,21 @@ class Comment
 		return $row !== false ? $row : null;
 	}
 
+	public function findByIdEnriched(int $id): ?array
+	{
+		$stmt = $this->pdo->prepare(
+			"SELECT comments.id, comments.image_id, comments.user_id,
+			        comments.content, comments.created_at,
+			        users.username, users.avatar_path
+			 FROM comments
+			 INNER JOIN users ON users.id = comments.user_id
+			 WHERE comments.id = :id LIMIT 1"
+		);
+		$stmt->execute([":id" => $id]);
+		$row = $stmt->fetch();
+		return $row !== false ? $row : null;
+	}
+
 	public function delete(int $id): bool
 	{
 		$stmt = $this->pdo->prepare("DELETE FROM comments WHERE id = :id");

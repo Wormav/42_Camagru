@@ -17,7 +17,6 @@
 
 	<div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28 grid lg:grid-cols-12 gap-10 items-center">
 
-		<!-- Left: copy + CTA -->
 		<div class="lg:col-span-7 flex flex-col gap-6 animate-rise">
 			<span class="brutal-tag bg-cyan self-start">// 42 project</span>
 
@@ -50,7 +49,6 @@
 				<?php endif; ?>
 			</div>
 
-			<!-- Stats strip -->
 			<dl class="flex flex-wrap items-center gap-6 mt-6">
 				<div>
 					<dt class="font-mono text-xs uppercase tracking-wider opacity-60">Snaps captured</dt>
@@ -67,11 +65,9 @@
 			</dl>
 		</div>
 
-		<!-- Right: two photos stacked with offset rotation, polaroid-brutal vibe -->
 		<div class="lg:col-span-5 relative">
 			<div class="relative w-full max-w-md mx-auto" style="aspect-ratio: 4/5;">
 
-				<!-- Back photo: lower-left, slight counter-rotation. -->
 				<figure class="absolute bottom-0 left-0 border-3 border-ink bg-paper p-2 sm:p-3 shadow-brutal z-10" style="width: 68%; aspect-ratio: 4/5; transform: rotate(-4deg);">
 					<img
 						src="/assets/photos/hero-2.jpg"
@@ -83,14 +79,12 @@
 					</figcaption>
 				</figure>
 
-				<!-- Front photo: upper-right, slight positive rotation, bigger shadow. -->
 				<figure class="absolute top-0 right-0 border-3 border-ink bg-paper p-2 sm:p-3 shadow-brutal-lg z-20" style="width: 68%; aspect-ratio: 4/5; transform: rotate(3deg);">
 					<img
 						src="/assets/photos/hero-1.jpg"
 						alt=""
 						class="w-full h-full object-cover border-2 border-ink"
 					>
-					<!-- Sticker pin -->
 					<span aria-hidden="true" class="sticker absolute -top-3 -right-3">LIVE</span>
 					<figcaption class="absolute -bottom-2 left-1/2 -translate-x-1/2 brutal-tag bg-lime whitespace-nowrap text-[0.65rem]">
 						// snap_002

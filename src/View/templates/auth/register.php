@@ -115,4 +115,4 @@ use App\Core\Csrf;
 	</p>
 </section>
 
-<script src="/js/register.js" defer></script>
+<script src="/dist/register.bundle.js" defer></script>
