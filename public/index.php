@@ -16,6 +16,7 @@ require __DIR__ . "/../vendor/autoload.php";
 use App\Controller\AuthController;
 use App\Controller\GalleryController;
 use App\Controller\HomeController;
+use App\Controller\LikeController;
 use App\Controller\PostController;
 use App\Controller\ProfileController;
 use App\Core\Env;
@@ -50,5 +51,6 @@ $router->get("/gallery", [GalleryController::class, "showGallery"]);
 $router->get("/post", [PostController::class, "showPost"]);
 $router->post("/post/capture", [PostController::class, "capture"]);
 $router->post("/post/delete", [PostController::class, "delete"]);
+$router->post("/likes/toggle", [LikeController::class, "toggle"]);
 
 $router->dispatch($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"]);
