@@ -27,7 +27,6 @@ class Env
 		foreach ($lines as $line) {
 			$trimmed = ltrim($line);
 
-			// Skip comments and lines without an assignment.
 			if ($trimmed === "" || str_starts_with($trimmed, "#")) {
 				continue;
 			}
@@ -39,7 +38,6 @@ class Env
 			$key = trim($key);
 			$value = trim($value);
 
-			// Strip a single pair of surrounding quotes if present.
 			if (strlen($value) >= 2) {
 				$first = $value[0];
 				$last = $value[strlen($value) - 1];
@@ -58,6 +56,13 @@ class Env
 
 	public static function get(string $key, ?string $default = null): ?string
 	{
+		$value = getenv($key);
+		if ($value !== false) {
+			return $value;
+		}
+		if (array_key_exists($key, $_ENV)) {
+			return (string) $_ENV[$key];
+		}
 		return self::$values[$key] ?? $default;
 	}
 }
