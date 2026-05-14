@@ -10,12 +10,7 @@
  */
 
 ?>
-
-<!-- ============================================================ -->
-<!-- HERO                                                          -->
-<!-- ============================================================ -->
 <section class="relative overflow-hidden bg-paper">
-	<!-- Decorative offset blocks behind the hero. Pure decoration, aria-hidden. -->
 	<div aria-hidden="true" class="absolute -top-10 -left-10 w-40 h-40 bg-lime border-3 border-ink rotate-[-12deg] hidden md:block"></div>
 	<div aria-hidden="true" class="absolute top-20 right-10 w-24 h-24 bg-pink border-3 border-ink rotate-[8deg] hidden md:block"></div>
 	<div aria-hidden="true" class="absolute bottom-10 left-1/3 w-16 h-16 bg-cyan border-3 border-ink rotate-[20deg] hidden md:block"></div>
