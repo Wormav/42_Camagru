@@ -64,7 +64,8 @@ class Image
 	public function findFeed(int $limit, int $offset, ?int $currentUserId = null): array
 	{
 		$stmt = $this->pdo->prepare(
-			"SELECT images.id, images.user_id, images.image_path, images.overlay_used, images.created_at, users.username,
+			"SELECT images.id, images.user_id, images.image_path, images.overlay_used, images.created_at,
+			users.username, users.avatar_path,
 			COUNT(DISTINCT likes.id) AS like_count,
 			COUNT(DISTINCT comments.id) AS comment_count,
 			EXISTS (
@@ -90,7 +91,8 @@ class Image
 	public function findOneEnriched(int $imageId, ?int $currentUserId = null): ?array
 	{
 		$stmt = $this->pdo->prepare(
-			"SELECT images.id, images.user_id, images.image_path, images.overlay_used, images.created_at, users.username,
+			"SELECT images.id, images.user_id, images.image_path, images.overlay_used, images.created_at,
+			users.username, users.avatar_path,
 			COUNT(DISTINCT likes.id) AS like_count,
 			COUNT(DISTINCT comments.id) AS comment_count,
 			EXISTS (

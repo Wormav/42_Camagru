@@ -32,7 +32,7 @@ class Comment
 		$stmt = $this->pdo->prepare(
 			"SELECT comments.id, comments.image_id, comments.user_id,
 			        comments.content, comments.created_at,
-			        users.username
+			        users.username, users.avatar_path
 			 FROM comments
 			 INNER JOIN users ON users.id = comments.user_id
 			 WHERE comments.image_id = :image_id

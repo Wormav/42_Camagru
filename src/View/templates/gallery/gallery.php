@@ -105,9 +105,19 @@ $pages = $paginationWindow($page, $totalPages);
 
 						<figcaption class="p-4 sm:p-5 flex flex-col gap-3 flex-1">
 							<div class="flex items-center justify-between gap-3">
-								<p class="font-display font-black text-sm uppercase truncate">
-									@<?= $e($item["username"]) ?>
-								</p>
+								<div class="flex items-center gap-2 min-w-0 flex-1">
+									<?php $authorAvatar = $item["avatar_path"] ?? null; ?>
+									<?php if (is_string($authorAvatar) && $authorAvatar !== ""): ?>
+										<img src="<?= $e($authorAvatar) ?>" alt="" loading="lazy" class="w-8 h-8 object-cover border-2 border-ink shrink-0">
+									<?php else: ?>
+										<div class="w-8 h-8 flex items-center justify-center bg-cyan border-2 border-ink font-display font-black text-xs uppercase shrink-0">
+											<?= $e(mb_substr((string) $item["username"], 0, 1)) ?>
+										</div>
+									<?php endif; ?>
+									<p class="font-display font-black text-sm uppercase truncate">
+										@<?= $e($item["username"]) ?>
+									</p>
+								</div>
 								<?php if ($createdIso !== ""): ?>
 									<time datetime="<?= $e($createdIso) ?>" class="font-mono text-[0.7rem] uppercase tracking-wider opacity-60 shrink-0">
 										<?= $e($createdHuman) ?>
