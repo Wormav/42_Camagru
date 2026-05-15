@@ -42,6 +42,24 @@ $flashError   = Flash::get("error");
 	<meta name="csrf-token" content="<?= $e(Csrf::token()) ?>">
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 	<title><?= $e($title ?? "Camagru") ?></title>
+	<?php if (isset($og) && is_array($og)): ?>
+		<meta property="og:type" content="article">
+		<meta property="og:site_name" content="Camagru">
+		<?php if (isset($og["title"])): ?>
+			<meta property="og:title" content="<?= $e((string) $og["title"]) ?>">
+		<?php endif; ?>
+		<?php if (isset($og["description"])): ?>
+			<meta property="og:description" content="<?= $e((string) $og["description"]) ?>">
+		<?php endif; ?>
+		<?php if (isset($og["image"])): ?>
+			<meta property="og:image" content="<?= $e((string) $og["image"]) ?>">
+			<meta name="twitter:card" content="summary_large_image">
+			<meta name="twitter:image" content="<?= $e((string) $og["image"]) ?>">
+		<?php endif; ?>
+		<?php if (isset($og["url"])): ?>
+			<meta property="og:url" content="<?= $e((string) $og["url"]) ?>">
+		<?php endif; ?>
+	<?php endif; ?>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="/style.css">
