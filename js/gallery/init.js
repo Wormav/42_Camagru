@@ -23,6 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 	}
 
+	const modeToggle = document.querySelector("[data-mode-toggle]");
+	if (modeToggle instanceof HTMLElement) {
+		modeToggle.addEventListener("click", (event) => {
+			const target = event.target;
+			if (!(target instanceof Element)) {
+				return;
+			}
+			const option = target.closest("[data-mode-option]");
+			if (!(option instanceof HTMLButtonElement) || !modeToggle.contains(option)) {
+				return;
+			}
+			event.preventDefault();
+			window.Camagru.gallery.handleModeClick(option);
+		});
+		window.Camagru.gallery.applyGalleryMode();
+	}
+
 	const commentForm = document.querySelector("[data-comment-form]");
 	if (commentForm instanceof HTMLFormElement) {
 		commentForm.addEventListener("submit", (event) => {

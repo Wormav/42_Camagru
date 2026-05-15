@@ -48,6 +48,53 @@ class GalleryController
 		]);
 	}
 
+	public function feedJson(): void
+	{
+		$dbConfig = require __DIR__ . "/../../config/database.php";
+		$pdo      = (new Database($dbConfig))->connection();
+		$images   = new Image($pdo);
+
+		$total      = $images->countAll();
+		$totalPages = max(1, (int) ceil($total / self::PER_PAGE));
+
+		$page = (int) ($_GET["page"] ?? 1);
+		if ($page < 1) {
+			$page = 1;
+		}
+
+		header("Content-Type: application/json; charset=utf-8");
+
+		if ($page > $totalPages) {
+			echo json_encode([
+				"ok"       => true,
+				"html"     => "",
+				"page"     => $page,
+				"hasMore"  => false,
+			]);
+			return;
+		}
+
+		$offset        = ($page - 1) * self::PER_PAGE;
+		$currentUserId = Auth::id();
+		$items         = $images->findFeed(self::PER_PAGE, $offset, $currentUserId);
+		$isAuth        = Auth::check();
+
+		$e = static fn (mixed $v): string => htmlspecialchars((string) $v, ENT_QUOTES, "UTF-8");
+
+		ob_start();
+		foreach ($items as $item) {
+			include __DIR__ . "/../View/templates/gallery/_card.php";
+		}
+		$html = (string) ob_get_clean();
+
+		echo json_encode([
+			"ok"      => true,
+			"html"    => $html,
+			"page"    => $page,
+			"hasMore" => $page < $totalPages,
+		]);
+	}
+
 	public function showImage(): void
 	{
 		$imageId = (int) ($_GET["id"] ?? 0);

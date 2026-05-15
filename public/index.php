@@ -62,6 +62,7 @@ $router->post("/profile/password", [ProfileController::class, "updatePassword"])
 $router->post("/profile/notifications", [ProfileController::class, "updateNotifications"]);
 $router->post("/profile/avatar", [ProfileController::class, "updateAvatar"]);
 $router->get("/gallery", [GalleryController::class, "showGallery"]);
+$router->get("/gallery/feed", [GalleryController::class, "feedJson"]);
 $router->get("/image", [GalleryController::class, "showImage"]);
 $router->get("/post", [PostController::class, "showPost"]);
 $router->post("/post/capture", [PostController::class, "capture"]);
