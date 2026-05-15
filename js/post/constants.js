@@ -11,4 +11,6 @@ window.Camagru.post.STATUS_LABEL = {
 window.Camagru.post.state = {
 	selectedOverlayId: null,
 	activeStream: null,
+	overlayImage: null,
+	rafId: null,
 };

@@ -1,12 +1,12 @@
 window.Camagru.post.detectSource = () => {
-	const video = document.querySelector("[data-stage-video]");
+	const canvas = document.querySelector("[data-stage-canvas]");
 	const imageEl = document.querySelector("[data-stage-image]");
 
-	if (!(video instanceof HTMLVideoElement) || !(imageEl instanceof HTMLImageElement)) {
+	if (!(canvas instanceof HTMLCanvasElement) || !(imageEl instanceof HTMLImageElement)) {
 		return null;
 	}
 
-	if (!video.classList.contains("hidden") && window.Camagru.post.state.activeStream !== null) {
+	if (!canvas.classList.contains("hidden") && window.Camagru.post.state.activeStream !== null) {
 		return "webcam";
 	}
 	if (!imageEl.classList.contains("hidden") && imageEl.src !== "") {
