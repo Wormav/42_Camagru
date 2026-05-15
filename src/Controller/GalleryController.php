@@ -70,6 +70,30 @@ class GalleryController
 
 		$comments = (new Comment($pdo))->findByImageId($imageId);
 
+		$scheme = (
+			(!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off")
+			|| (($_SERVER["HTTP_X_FORWARDED_PROTO"] ?? "") === "https")
+		) ? "https" : "http";
+		$host    = (string) ($_SERVER["HTTP_HOST"] ?? "localhost");
+		$baseUrl = $scheme . "://" . $host;
+
+		$pageUrl  = $baseUrl . "/image?id=" . $imageId;
+		$imageUrl = $baseUrl . (string) $item["image_path"];
+
+		$shareText = "Check out this snap by @" . $item["username"] . " on Camagru";
+
+		$share = [
+			"twitter" => "https://twitter.com/intent/tweet?url=" . rawurlencode($pageUrl) . "&text=" . rawurlencode($shareText),
+			"link"    => $pageUrl,
+		];
+
+		$og = [
+			"title"       => "Snap by @" . $item["username"] . " — Camagru",
+			"description" => "A photobooth snap shared on Camagru.",
+			"image"       => $imageUrl,
+			"url"         => $pageUrl,
+		];
+
 		$view = new View(__DIR__ . "/../View/templates");
 		$view->render("gallery/detail", [
 			"title"         => "Snap by @" . $item["username"],
@@ -78,6 +102,8 @@ class GalleryController
 			"comments"      => $comments,
 			"isAuth"        => Auth::check(),
 			"currentUserId" => $currentUserId,
+			"og"            => $og,
+			"share"         => $share,
 		]);
 	}
 }

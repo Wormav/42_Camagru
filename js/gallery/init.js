@@ -6,12 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
 			if (!(target instanceof Element)) {
 				return;
 			}
-			const button = target.closest("[data-action='toggle-like']");
-			if (!(button instanceof HTMLButtonElement) || !grid.contains(button)) {
+
+			const likeBtn = target.closest("[data-action='toggle-like']");
+			if (likeBtn instanceof HTMLButtonElement && grid.contains(likeBtn)) {
+				event.preventDefault();
+				window.Camagru.gallery.toggleLike(likeBtn);
 				return;
 			}
-			event.preventDefault();
-			window.Camagru.gallery.toggleLike(button);
+
+			const copyBtn = target.closest("[data-action='copy-share-link']");
+			if (copyBtn instanceof HTMLButtonElement && grid.contains(copyBtn)) {
+				event.preventDefault();
+				window.Camagru.gallery.copyShareLink(copyBtn);
+				return;
+			}
 		});
 	}
 

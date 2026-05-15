@@ -105,6 +105,39 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 						<span data-comment-count><?= $e((int) $item["comment_count"]) ?></span>
 					</span>
 				</div>
+
+				<?php if (isset($share) && is_array($share)): ?>
+					<div class="flex flex-wrap items-center gap-2 pt-2 border-t-3 border-ink">
+						<p class="brutal-label !mb-0 mr-1">Share</p>
+
+						<a
+							href="<?= $e((string) ($share["twitter"] ?? "#")) ?>"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="w-10 h-10 flex items-center justify-center border-3 border-ink bg-paper shadow-brutal-sm hover:bg-cyan hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal transition-all"
+							aria-label="Share on X (Twitter)"
+							title="Share on X"
+						>
+							<svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4" aria-hidden="true">
+								<path d="M18.244 2H21.5l-7.46 8.527L23 22h-6.79l-5.32-6.953L4.8 22H1.54l7.98-9.12L1 2h6.96l4.81 6.36L18.244 2zm-1.19 18h1.88L7.04 4H5.06L17.054 20z"/>
+							</svg>
+						</a>
+
+						<button
+							type="button"
+							data-action="copy-share-link"
+							data-share-link="<?= $e((string) ($share["link"] ?? "")) ?>"
+							class="w-10 h-10 flex items-center justify-center border-3 border-ink bg-paper shadow-brutal-sm hover:bg-lime hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal transition-all"
+							aria-label="Copy link to clipboard"
+							title="Copy link"
+						>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
+								<rect x="9" y="9" width="13" height="13" rx="0"/>
+								<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+							</svg>
+						</button>
+					</div>
+				<?php endif; ?>
 			</div>
 		</article>
 
