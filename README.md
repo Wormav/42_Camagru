@@ -1,22 +1,32 @@
 # Camagru
 
-A web-based photobooth application built as a 42 school project (subject v4.1).
+![PHP](https://img.shields.io/badge/Server-PHP-777BB4)
+![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1)
+![Nginx](https://img.shields.io/badge/Webserver-Nginx-009639)
+![Docker](https://img.shields.io/badge/Container-Docker-2496ED)
+![TailwindCSS](https://img.shields.io/badge/CSS-Tailwind-06B6D4)
+![Vanilla JS](https://img.shields.io/badge/Client-Vanilla_JS-F7DF1E)
+![GD](https://img.shields.io/badge/Image-GD-white)
 
-Users can capture photos via webcam (or upload an image), overlay them with selectable PNG stickers (alpha channel), and the server merges both images into a final composition. All creations are displayed in a public gallery where users can like and comment.
+A web-based photobooth application built as a **42 school project** (subject v4.1).
+
+Users capture photos via webcam (or upload an image), overlay them with selectable PNG stickers (alpha channel), and the server merges both images into a final composition. All creations are displayed in a public gallery where users can like and comment.
+
+![Camagru home page](docs/home.png)
 
 ## Tech Stack
 
-| Component | Choice |
-|-----------|--------|
-| Server | PHP (standard library only, no framework) |
-| Architecture | MVC from scratch |
-| CSS | Tailwind CSS (CLI build, static CSS output) |
-| Database | MySQL via PDO (prepared statements) |
-| Image processing | GD (PHP extension) |
-| Email | Native `mail()` |
-| Web server | Nginx |
-| Containerization | Docker + docker-compose |
-| JavaScript | Vanilla JS (browser native APIs only) |
+| Component        | Choice                                    |
+|------------------|-------------------------------------------|
+| Server           | PHP (standard library only, no framework) |
+| Architecture     | MVC from scratch                          |
+| CSS              | Tailwind CSS (CLI build, static output)   |
+| Database         | MySQL via PDO (prepared statements)       |
+| Image processing | GD (PHP extension)                        |
+| Email            | Native `mail()`                           |
+| Web server       | Nginx                                     |
+| Containerization | Docker + docker-compose                   |
+| JavaScript       | Vanilla JS (browser native APIs only)     |
 
 ## Features
 
@@ -31,22 +41,36 @@ Users can capture photos via webcam (or upload an image), overlay them with sele
 
 ### Bonus
 
-- AJAX interactions (native `fetch()`)
-- Live overlay preview on webcam stream (canvas + `requestAnimationFrame`)
-- Infinite scroll pagination (`IntersectionObserver`)
-- Social media sharing (URL-based, no SDK)
-- Animated GIF rendering (multi-frame capture + server encoding)
+- **AJAX interactions** — All exchanges via native `fetch()` (likes, comments, captures, delete)
+- **Live overlay preview** — Real-time overlay rendering on the webcam stream (canvas + `requestAnimationFrame`)
+- **Infinite scroll** — Optional toggle on the gallery (`IntersectionObserver` + AJAX feed)
+- **Social sharing** — Share to X (Twitter) + copy-to-clipboard, with Open Graph meta tags
 
 ## Getting Started
 
 ```bash
 git clone git@github.com:Wormav/42_Camagru.git
+cd 42_Camagru
 cp .env.example .env
 # Edit .env with your credentials
-docker-compose up
+make all
 ```
 
 The application will be available at `http://localhost:8080`.
+
+### Useful commands
+
+```bash
+make all           # Build CSS, JS, images and start docker-compose
+make clean         # Stop containers (keeps volumes)
+make fclean        # Stop + drop volumes + wipe local images and uploads
+make logs          # Tail container logs
+make shell         # Shell inside the PHP container
+make db            # MySQL shell inside the db container
+make fake          # Restore the demo dataset (seeded users + snaps)
+make tailwind      # Rebuild minified CSS
+make js            # Concat JS bundles into public/dist/
+```
 
 ## Project Constraints
 
@@ -61,4 +85,4 @@ This project follows strict rules imposed by the 42 subject:
 
 ## License
 
-This project is a school assignment and is not intended for production use.
+This project is a 42 school assignment and is not intended for production use.
