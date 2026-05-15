@@ -45,8 +45,13 @@ $imageCount = count($userImages);
 						autoplay
 						muted
 						playsinline
-						class="absolute inset-0 w-full h-full object-cover hidden"
+						class="hidden"
 					></video>
+
+					<canvas
+						data-stage-canvas
+						class="absolute inset-0 w-full h-full object-cover hidden"
+					></canvas>
 
 					<img
 						data-stage-image

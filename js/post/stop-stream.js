@@ -1,4 +1,6 @@
 window.Camagru.post.stopStream = () => {
+	window.Camagru.post.stopPreviewLoop();
+
 	const stream = window.Camagru.post.state.activeStream;
 	if (stream === null) {
 		return;

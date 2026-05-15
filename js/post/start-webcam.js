@@ -13,7 +13,12 @@ window.Camagru.post.startWebcam = async () => {
 
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia({
-			video: { facingMode: "user" },
+			video: {
+				facingMode: "user",
+				width: { ideal: 1280 },
+				height: { ideal: 720 },
+				aspectRatio: { ideal: 16 / 9 },
+			},
 			audio: false,
 		});
 
@@ -22,6 +27,7 @@ window.Camagru.post.startWebcam = async () => {
 		video.srcObject = stream;
 
 		window.Camagru.post.showSource("webcam");
+		window.Camagru.post.startPreviewLoop();
 	} catch (error) {
 		console.warn("[post] getUserMedia failed:", error);
 

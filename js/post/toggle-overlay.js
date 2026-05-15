@@ -10,9 +10,11 @@ window.Camagru.post.toggleOverlay = (tile) => {
 
 	if (isActive) {
 		window.Camagru.post.state.selectedOverlayId = null;
+		window.Camagru.post.setOverlayImage(null);
 	} else {
 		tile.setAttribute("aria-pressed", "true");
 		window.Camagru.post.state.selectedOverlayId = tile.dataset.overlayId || null;
+		window.Camagru.post.setOverlayImage(tile.dataset.overlayPath || null);
 	}
 
 	window.Camagru.post.updateCaptureButton();
