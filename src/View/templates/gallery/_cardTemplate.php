@@ -22,7 +22,7 @@ $authorAvatar = $item["avatar_path"] ?? null;
 				src="<?= $e($item["image_path"]) ?>"
 				alt="Snap by <?= $e($item["username"]) ?>"
 				loading="lazy"
-				class="w-full h-full object-cover transition-transform group-hover:scale-105"
+				class="w-full h-full object-contain transition-transform group-hover:scale-105"
 			>
 		</a>
 

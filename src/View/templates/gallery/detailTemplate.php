@@ -46,7 +46,7 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 				<img
 					src="<?= $e($item["image_path"]) ?>"
 					alt="Snap by <?= $e($item["username"]) ?>"
-					class="w-full h-full object-cover"
+					class="w-full h-full object-contain"
 				>
 			</div>
 

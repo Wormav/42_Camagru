@@ -13,4 +13,5 @@ window.Camagru.post.state = {
 	activeStream: null,
 	overlayImage: null,
 	rafId: null,
+	sourceMode: null,
 };

@@ -17,8 +17,13 @@ window.Camagru.post.loadUpload = (file) => {
 
 	reader.addEventListener("load", () => {
 		window.Camagru.post.stopStream();
-		imageEl.src = typeof reader.result === "string" ? reader.result : "";
-		window.Camagru.post.showSource("image");
+		const dataUrl = typeof reader.result === "string" ? reader.result : "";
+		imageEl.addEventListener("load", () => {
+			window.Camagru.post.state.sourceMode = "image";
+			window.Camagru.post.redrawUpload();
+			window.Camagru.post.showSource("image");
+		}, { once: true });
+		imageEl.src = dataUrl;
 	});
 
 	reader.addEventListener("error", () => {

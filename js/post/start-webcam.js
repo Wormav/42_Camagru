@@ -26,6 +26,7 @@ window.Camagru.post.startWebcam = async () => {
 		window.Camagru.post.state.activeStream = stream;
 		video.srcObject = stream;
 
+		window.Camagru.post.state.sourceMode = "webcam";
 		window.Camagru.post.showSource("webcam");
 		window.Camagru.post.startPreviewLoop();
 	} catch (error) {

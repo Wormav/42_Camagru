@@ -12,9 +12,7 @@ window.Camagru.post.showSource = (source) => {
 	canvas.classList.add("hidden");
 	imageEl.classList.add("hidden");
 
-	if (source === "webcam") {
+	if (source === "webcam" || source === "image") {
 		canvas.classList.remove("hidden");
-	} else if (source === "image") {
-		imageEl.classList.remove("hidden");
 	}
 };

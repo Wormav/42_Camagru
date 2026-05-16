@@ -30,12 +30,42 @@ window.Camagru.post.startPreviewLoop = () => {
 	window.Camagru.post.state.rafId = requestAnimationFrame(tick);
 };
 
+window.Camagru.post.redrawUpload = () => {
+	const canvas = document.querySelector("[data-stage-canvas]");
+	const imageEl = document.querySelector("[data-stage-image]");
+	if (!(canvas instanceof HTMLCanvasElement) || !(imageEl instanceof HTMLImageElement)) {
+		return;
+	}
+	if (imageEl.naturalWidth === 0 || imageEl.naturalHeight === 0) {
+		return;
+	}
+	const ctx = canvas.getContext("2d");
+	if (ctx === null) {
+		return;
+	}
+	canvas.width = imageEl.naturalWidth;
+	canvas.height = imageEl.naturalHeight;
+	ctx.drawImage(imageEl, 0, 0, canvas.width, canvas.height);
+	const overlay = window.Camagru.post.state.overlayImage;
+	if (overlay !== null && overlay.complete && overlay.naturalWidth > 0) {
+		ctx.drawImage(overlay, 0, 0, canvas.width, canvas.height);
+	}
+};
+
 window.Camagru.post.setOverlayImage = (path) => {
 	if (path === null || path === "") {
 		window.Camagru.post.state.overlayImage = null;
+		if (window.Camagru.post.state.sourceMode === "image") {
+			window.Camagru.post.redrawUpload();
+		}
 		return;
 	}
 	const img = new Image();
+	img.addEventListener("load", () => {
+		if (window.Camagru.post.state.sourceMode === "image") {
+			window.Camagru.post.redrawUpload();
+		}
+	}, { once: true });
 	img.src = path;
 	window.Camagru.post.state.overlayImage = img;
 };
