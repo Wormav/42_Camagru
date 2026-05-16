@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Core\AuthCore;
 use App\Core\DatabaseCore;
+use App\Core\JsonCore;
 use App\Model\CommentModel;
 use App\Model\ImageModel;
 use App\View\View;
@@ -62,16 +63,12 @@ class GalleryController
 			$page = 1;
 		}
 
-		header("Content-Type: application/json; charset=utf-8");
-
 		if ($page > $totalPages) {
-			echo json_encode([
-				"ok"       => true,
-				"html"     => "",
-				"page"     => $page,
-				"hasMore"  => false,
+			JsonCore::success([
+				"html"    => "",
+				"page"    => $page,
+				"hasMore" => false,
 			]);
-			return;
 		}
 
 		$offset        = ($page - 1) * self::PER_PAGE;
@@ -87,8 +84,7 @@ class GalleryController
 		}
 		$html = (string) ob_get_clean();
 
-		echo json_encode([
-			"ok"      => true,
+		JsonCore::success([
 			"html"    => $html,
 			"page"    => $page,
 			"hasMore" => $page < $totalPages,

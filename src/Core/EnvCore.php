@@ -16,7 +16,7 @@ class EnvCore
 		}
 
 		if (!is_file($path)) {
-			throw new \RuntimeException("EnvCore file not found: {$path}");
+			throw new \RuntimeException("Env file not found: {$path}");
 		}
 
 		$lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

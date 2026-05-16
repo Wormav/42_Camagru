@@ -138,8 +138,8 @@ class ProfileController
 		$users->updateNotifyComments((int) $currentUser["id"], $notify);
 
 		FlashCore::success($notify
-			? "CommentModel notifications enabled."
-			: "CommentModel notifications disabled.");
+			? "Comment notifications enabled."
+			: "Comment notifications disabled.");
 		$this->redirectToProfile();
 	}
 

@@ -166,7 +166,7 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 					class="mt-0.5 w-5 h-5 border-3 border-ink accent-lime cursor-pointer"
 				>
 				<span>
-					<span class="brutal-label !mb-0">CommentModel notifications</span>
+					<span class="brutal-label !mb-0">Comment notifications</span>
 					<span class="block mt-1 font-mono text-xs opacity-70">
 						// receive an email when someone comments on your photos.
 					</span>

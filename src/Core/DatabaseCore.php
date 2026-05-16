@@ -48,7 +48,7 @@ class DatabaseCore
 			);
 		} catch (PDOException $e) {
 			throw new RuntimeException(
-				"DatabaseCore connection failed: " . $e->getMessage(),
+				"Database connection failed: " . $e->getMessage(),
 				(int) $e->getCode(),
 				$e,
 			);

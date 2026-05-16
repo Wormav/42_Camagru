@@ -43,7 +43,7 @@ class FlashCore
 	{
 		if (!in_array($type, self::ALLOWED_TYPES, true)) {
 			throw new \InvalidArgumentException(
-				"FlashCore type must be one of: "
+				"Flash type must be one of: "
 				. implode(", ", self::ALLOWED_TYPES),
 			);
 		}

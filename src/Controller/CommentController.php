@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Core\AuthCore;
 use App\Core\CsrfCore;
 use App\Core\DatabaseCore;
+use App\Core\JsonCore;
 use App\Model\CommentModel;
 use App\Model\ImageModel;
 use App\Model\UserModel;
@@ -20,27 +21,27 @@ class CommentController
 	public function create(): void
 	{
 		if (!AuthCore::check()) {
-			$this->jsonError(401, "Sign in required.");
+			JsonCore::error(401, "Sign in required.");
 		}
 
 		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
 			? $_POST[CsrfCore::fieldName()]
 			: "";
 		if (!CsrfCore::validate($submittedToken)) {
-			$this->jsonError(403, "Invalid CSRF token.");
+			JsonCore::error(403, "Invalid CSRF token.");
 		}
 
 		$imageId = (int) ($_POST["image_id"] ?? 0);
 		$content = trim((string) ($_POST["content"] ?? ""));
 
 		if ($imageId <= 0) {
-			$this->jsonError(400, "Missing image.");
+			JsonCore::error(400, "Missing image.");
 		}
 		if ($content === "") {
-			$this->jsonError(400, "CommentModel cannot be empty.");
+			JsonCore::error(400, "Comment cannot be empty.");
 		}
 		if (mb_strlen($content) > self::CONTENT_MAX_LENGTH) {
-			$this->jsonError(400, "CommentModel is too long (max " . self::CONTENT_MAX_LENGTH . " characters).");
+			JsonCore::error(400, "Comment is too long (max " . self::CONTENT_MAX_LENGTH . " characters).");
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
@@ -49,7 +50,7 @@ class CommentController
 		$images = new ImageModel($pdo);
 		$image  = $images->findById($imageId);
 		if ($image === null) {
-			$this->jsonError(404, "ImageModel not found.");
+			JsonCore::error(404, "Image not found.");
 		}
 
 		$commenterId = (int) AuthCore::id();
@@ -58,7 +59,7 @@ class CommentController
 
 		$row = $comments->findByIdEnriched($commentId);
 		if ($row === null) {
-			$this->jsonError(500, "Could not load created comment.");
+			JsonCore::error(500, "Could not load created comment.");
 		}
 
 		$this->maybeSendNotification($pdo, (int) $image["user_id"], $commenterId, $imageId, $content);
@@ -67,7 +68,7 @@ class CommentController
 		$createdIso   = $createdTs !== false ? date("c", $createdTs) : "";
 		$createdHuman = $createdTs !== false ? date("M j, H:i", $createdTs) : "";
 
-		$this->jsonSuccess([
+		JsonCore::success([
 			"comment" => [
 				"id"            => (int) $row["id"],
 				"image_id"      => (int) $row["image_id"],
@@ -124,19 +125,19 @@ class CommentController
 	public function delete(): void
 	{
 		if (!AuthCore::check()) {
-			$this->jsonError(401, "Sign in required.");
+			JsonCore::error(401, "Sign in required.");
 		}
 
 		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
 			? $_POST[CsrfCore::fieldName()]
 			: "";
 		if (!CsrfCore::validate($submittedToken)) {
-			$this->jsonError(403, "Invalid CSRF token.");
+			JsonCore::error(403, "Invalid CSRF token.");
 		}
 
 		$commentId = (int) ($_POST["comment_id"] ?? 0);
 		if ($commentId <= 0) {
-			$this->jsonError(400, "Missing comment.");
+			JsonCore::error(400, "Missing comment.");
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
@@ -145,39 +146,24 @@ class CommentController
 		$comments = new CommentModel($pdo);
 		$comment  = $comments->findById($commentId);
 		if ($comment === null) {
-			$this->jsonError(404, "CommentModel not found.");
+			JsonCore::error(404, "Comment not found.");
 		}
 
 		if ((int) $comment["user_id"] !== (int) AuthCore::id()) {
-			$this->jsonError(403, "You can only delete your own comments.");
+			JsonCore::error(403, "You can only delete your own comments.");
 		}
 
 		if (!$comments->delete($commentId)) {
-			$this->jsonError(500, "Could not delete comment.");
+			JsonCore::error(500, "Could not delete comment.");
 		}
 
 		$imageId = (int) $comment["image_id"];
 
-		$this->jsonSuccess([
+		JsonCore::success([
 			"comment_id"    => $commentId,
 			"image_id"      => $imageId,
 			"comment_count" => $comments->countByImageId($imageId),
 		]);
 	}
 
-	private function jsonError(int $status, string $message): void
-	{
-		http_response_code($status);
-		header("Content-Type: application/json; charset=utf-8");
-		echo json_encode(["ok" => false, "error" => $message], JSON_THROW_ON_ERROR);
-		exit;
-	}
-
-	private function jsonSuccess(array $payload = []): void
-	{
-		http_response_code(200);
-		header("Content-Type: application/json; charset=utf-8");
-		echo json_encode(["ok" => true] + $payload, JSON_THROW_ON_ERROR);
-		exit;
-	}
 }
