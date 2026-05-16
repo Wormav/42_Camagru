@@ -14,7 +14,7 @@ class View
 	}
 
 
-	public function render(string $template, array $data = [], ?string $layout = "app"): void
+	public function render(string $template, array $data = [], ?string $layout = "appTemplate"): void
 	{
 		$templatePath = $this->templatesDir . $template . ".php";
 		if (!file_exists($templatePath)) {

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-// Let PHP's built-in dev server serve static files directly (CSS, images, JS).
-// In production (Nginx), this is handled by `try_files` and never reached.
 if (PHP_SAPI === "cli-server") {
 	$path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 	if ($path !== "/" && $path !== false && is_file(__DIR__ . $path)) {
@@ -20,14 +18,14 @@ use App\Controller\HomeController;
 use App\Controller\LikeController;
 use App\Controller\PostController;
 use App\Controller\ProfileController;
-use App\Core\Env;
-use App\Core\Router;
-use App\Core\SecurityHeaders;
-use App\Core\Session;
+use App\Core\EnvCore;
+use App\Core\RouterCore;
+use App\Core\SecurityHeadersCore;
+use App\Core\SessionCore;
 
-Env::load(__DIR__ . "/../.env");
+EnvCore::load(__DIR__ . "/../.env");
 
-$appEnv = Env::get("APP_ENV", "production");
+$appEnv = EnvCore::get("APP_ENV", "production");
 error_reporting(E_ALL);
 if ($appEnv === "development") {
 	ini_set("display_errors", "1");
@@ -36,11 +34,11 @@ if ($appEnv === "development") {
 	ini_set("log_errors", "1");
 }
 
-SecurityHeaders::send();
+SecurityHeadersCore::send();
 
-Session::start();
+SessionCore::start();
 
-$router = new Router();
+$router = new RouterCore();
 
 $router->get("/", [HomeController::class, "index"]);
 $router->get("/register", [AuthController::class, "showRegister"]);

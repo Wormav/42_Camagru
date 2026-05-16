@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Csrf
+class CsrfCore
 {
 	private const SESSION_KEY = "csrf_token";
 	private const FIELD_NAME  = "csrf_token";
 
 	public static function token(): string
 	{
-		Session::start();
+		SessionCore::start();
 
-		if (!Session::has(self::SESSION_KEY)) {
-			Session::set(self::SESSION_KEY, bin2hex(random_bytes(32)));
+		if (!SessionCore::has(self::SESSION_KEY)) {
+			SessionCore::set(self::SESSION_KEY, bin2hex(random_bytes(32)));
 		}
 
-		return Session::get(self::SESSION_KEY);
+		return SessionCore::get(self::SESSION_KEY);
 	}
 
 	public static function validate(string $submitted): bool
 	{
-		$expected = Session::get(self::SESSION_KEY, "");
+		$expected = SessionCore::get(self::SESSION_KEY, "");
 		return hash_equals($expected, $submitted);
 	}
 

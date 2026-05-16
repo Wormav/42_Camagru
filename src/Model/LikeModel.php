@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-class Like
+class LikeModel
 {
 	public function __construct(private PDO $pdo)
 	{

@@ -1,6 +1,6 @@
 <?php
 /**
- * Image detail — single snap with likes and comments.
+ * ImageModel detail — single snap with likes and comments.
  *
  * @var \Closure(mixed): string $e          Escape helper.
  * @var string                  $title      Page title.
@@ -20,11 +20,11 @@
  * @var int|null  $currentUserId
  */
 
-use App\Core\Csrf;
+use App\Core\CsrfCore;
 
 $liked       = (int) ($item["user_has_liked"] ?? 0) === 1;
 $createdTs   = strtotime((string) $item["created_at"]);
-$createdIso  = $createdTs !== false ? date("c",          $createdTs) : "";
+$createdIso  = $createdTs !== false ? date("c", $createdTs) : "";
 $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 ?>
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12" data-gallery-grid>
@@ -41,7 +41,6 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 
 	<div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 lg:gap-8 items-start">
 
-		<!-- LEFT — image + meta + like -->
 		<article class="brutal-card bg-paper !p-0 overflow-hidden">
 			<div class="aspect-square w-full bg-ink border-b-3 border-ink overflow-hidden">
 				<img
@@ -82,7 +81,7 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 							data-liked="<?= $liked ? "true" : "false" ?>"
 							aria-pressed="<?= $liked ? "true" : "false" ?>"
 							class="brutal-tag inline-flex items-center gap-1.5 transition-colors <?= $liked ? "bg-pink" : "bg-paper hover:bg-pink" ?>"
-							aria-label="<?= $liked ? "Unlike" : "Like" ?>"
+							aria-label="<?= $liked ? "Unlike" : "LikeModel" ?>"
 						>
 							<svg viewBox="0 0 24 24" fill="<?= $liked ? "currentColor" : "none" ?>" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5" aria-hidden="true" data-like-icon>
 								<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -141,7 +140,6 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 			</div>
 		</article>
 
-		<!-- RIGHT — comments -->
 		<aside class="brutal-card bg-white !p-5 sm:!p-6 flex flex-col gap-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)]">
 
 			<div class="flex items-center justify-between gap-3">
@@ -167,8 +165,8 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 				<?php foreach ($comments as $comment): ?>
 					<?php
 					$cTs    = strtotime((string) $comment["created_at"]);
-					$cIso   = $cTs !== false ? date("c",          $cTs) : "";
-					$cHuman = $cTs !== false ? date("M j, H:i",   $cTs) : "";
+					$cIso   = $cTs !== false ? date("c", $cTs) : "";
+					$cHuman = $cTs !== false ? date("M j, H:i", $cTs) : "";
 					$isMine = $isAuth && $currentUserId !== null && (int) $comment["user_id"] === $currentUserId;
 					?>
 					<li class="border-3 border-ink bg-paper p-3 shadow-brutal-sm" data-comment-item data-comment-id="<?= $e((int) $comment["id"]) ?>">
@@ -196,7 +194,7 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 
 								<?php if ($isMine): ?>
 									<form method="POST" action="/comments/delete" data-delete-comment-form>
-										<?= Csrf::field() ?>
+										<?= CsrfCore::field() ?>
 										<input type="hidden" name="comment_id" value="<?= $e((int) $comment["id"]) ?>">
 										<button
 											type="submit"
@@ -221,7 +219,7 @@ $createdHuman = $createdTs !== false ? date("M j, Y · H:i", $createdTs) : "";
 
 			<?php if ($isAuth): ?>
 				<form method="POST" action="/comments" class="flex flex-col gap-2" data-comment-form>
-					<?= Csrf::field() ?>
+					<?= CsrfCore::field() ?>
 					<input type="hidden" name="image_id" value="<?= $e((int) $item["id"]) ?>">
 					<label class="sr-only" for="comment-input">Add a comment</label>
 					<textarea

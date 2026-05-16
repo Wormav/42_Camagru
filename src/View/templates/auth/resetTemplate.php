@@ -9,7 +9,7 @@
  * @var array<string, string>   $old     Previously submitted values (unused — we never echo passwords).
  */
 
-use App\Core\Csrf;
+use App\Core\CsrfCore;
 
 ?>
 <section class="max-w-xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
@@ -38,7 +38,7 @@ use App\Core\Csrf;
 		<?php endif; ?>
 
 		<form id="reset-form" method="POST" action="/reset/confirm" novalidate class="space-y-5">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 			<input type="hidden" name="token" value="<?= $e($token) ?>">
 
 			<div>

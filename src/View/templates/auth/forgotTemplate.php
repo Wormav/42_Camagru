@@ -8,7 +8,7 @@
  * @var array<string, string>   $old     Previously submitted values (email).
  */
 
-use App\Core\Csrf;
+use App\Core\CsrfCore;
 
 ?>
 <section class="max-w-xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
@@ -45,7 +45,7 @@ use App\Core\Csrf;
 		</p>
 
 		<form id="forgot-form" method="POST" action="/reset" novalidate class="space-y-5">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<div>
 				<label for="email" class="brutal-label">Email</label>

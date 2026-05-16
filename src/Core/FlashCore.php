@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Flash
+class FlashCore
 {
 	private const ALLOWED_TYPES = ["success", "error"];
 	private const KEY_PREFIX    = "flash_";
@@ -22,7 +22,7 @@ class Flash
 	public static function set(string $type, string $message): void
 	{
 		self::assertValidType($type);
-		Session::set(self::KEY_PREFIX . $type, $message);
+		SessionCore::set(self::KEY_PREFIX . $type, $message);
 	}
 
 	public static function get(string $type = "success"): ?string
@@ -30,12 +30,12 @@ class Flash
 		self::assertValidType($type);
 
 		$key = self::KEY_PREFIX . $type;
-		if (!Session::has($key)) {
+		if (!SessionCore::has($key)) {
 			return null;
 		}
 
-		$value = Session::get($key);
-		Session::remove($key);
+		$value = SessionCore::get($key);
+		SessionCore::remove($key);
 		return is_string($value) ? $value : null;
 	}
 
@@ -43,7 +43,7 @@ class Flash
 	{
 		if (!in_array($type, self::ALLOWED_TYPES, true)) {
 			throw new \InvalidArgumentException(
-				"Flash type must be one of: "
+				"FlashCore type must be one of: "
 				. implode(", ", self::ALLOWED_TYPES),
 			);
 		}

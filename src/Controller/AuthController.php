@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Csrf;
-use App\Core\Database;
-use App\Core\Flash;
-use App\Core\Session;
-use App\Core\Validator;
-use App\Model\User;
-use App\Service\Mailer;
+use App\Core\AuthCore;
+use App\Core\CsrfCore;
+use App\Core\DatabaseCore;
+use App\Core\FlashCore;
+use App\Core\SessionCore;
+use App\Core\ValidatorCore;
+use App\Model\UserModel;
+use App\Service\MailerService;
 use App\View\View;
 use Throwable;
 
@@ -24,10 +24,10 @@ class AuthController
 
 	public function register(): void
 	{
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			http_response_code(403);
 			echo "Forbidden";
 			return;
@@ -43,15 +43,15 @@ class AuthController
 			"username" => $username,
 		];
 
-		$errors = Validator::validateRegistration($email, $username, $password, $passwordConfirmation);
+		$errors = ValidatorCore::validateRegistration($email, $username, $password, $passwordConfirmation);
 		if (!empty($errors)) {
 			$this->renderRegister($errors, $old);
 			return;
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$users    = new User($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$users    = new UserModel($pdo);
 
 		if ($users->findByEmail($email) !== null || $users->findByUsername($username) !== null) {
 			$this->renderRegister(
@@ -65,7 +65,7 @@ class AuthController
 		$verificationToken = bin2hex(random_bytes(32));
 
 		$mailConfig = require __DIR__ . "/../../config/mail.php";
-		$mailer     = new Mailer($mailConfig);
+		$mailer     = new MailerService($mailConfig);
 
 		$pdo->beginTransaction();
 		try {
@@ -89,7 +89,7 @@ class AuthController
 	public function showCheckEmail(): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/check_email", [
+		$view->render("auth/check_emailTemplate", [
 			"title" => "Check your inbox",
 		]);
 	}
@@ -105,13 +105,13 @@ class AuthController
 		$success = false;
 		if ($looksValid) {
 			$dbConfig = require __DIR__ . "/../../config/database.php";
-			$pdo      = (new Database($dbConfig))->connection();
-			$users    = new User($pdo);
+			$pdo      = (new DatabaseCore($dbConfig))->connection();
+			$users    = new UserModel($pdo);
 			$success  = $users->verifyByToken($token);
 		}
 
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/verify", [
+		$view->render("auth/verifyTemplate", [
 			"title"   => $success ? "Account verified" : "Verification failed",
 			"success" => $success,
 		]);
@@ -120,7 +120,7 @@ class AuthController
 	private function renderRegister(array $errors, array $old): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/register", [
+		$view->render("auth/registerTemplate", [
 			"title"  => "Sign up",
 			"errors" => $errors,
 			"old"    => $old,
@@ -129,16 +129,16 @@ class AuthController
 
 	public function showLogin(): void
 	{
-		Auth::requireGuest();
+		AuthCore::requireGuest();
 		$this->renderLogin([], []);
 	}
 
 	public function login(): void
 	{
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			http_response_code(403);
 			echo "Forbidden";
 			return;
@@ -155,8 +155,8 @@ class AuthController
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$users    = new User($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$users    = new UserModel($pdo);
 
 		$user = $users->findByUsername($username);
 
@@ -169,12 +169,12 @@ class AuthController
 			return;
 		}
 
-		Session::regenerate();
-		Session::set("user_id", (int) $user["id"]);
-		Session::set("username", $user["username"]);
-		Session::set("avatar_path", $user["avatar_path"] ?? null);
+		SessionCore::regenerate();
+		SessionCore::set("user_id", (int) $user["id"]);
+		SessionCore::set("username", $user["username"]);
+		SessionCore::set("avatar_path", $user["avatar_path"] ?? null);
 
-		Flash::success("Welcome back, " . $user["username"] . " 👋");
+		FlashCore::success("Welcome back, " . $user["username"] . " 👋");
 
 		header("Location: /");
 		exit;
@@ -184,16 +184,16 @@ class AuthController
 
 	public function logout(): void
 	{
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			http_response_code(403);
 			echo "Forbidden";
 			return;
 		}
 
-		Session::destroy();
+		SessionCore::destroy();
 
 		header("Location: /");
 		exit;
@@ -202,7 +202,7 @@ class AuthController
 	private function renderLogin(array $errors, array $old): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/login", [
+		$view->render("auth/loginTemplate", [
 			"title"  => "Sign in",
 			"errors" => $errors,
 			"old"    => $old,
@@ -211,18 +211,18 @@ class AuthController
 
 	public function showForgotPassword(): void
 	{
-		Auth::requireGuest();
+		AuthCore::requireGuest();
 		$this->renderForgotPassword([], []);
 	}
 
 	public function forgotPassword(): void
 	{
-		Auth::requireGuest();
+		AuthCore::requireGuest();
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			http_response_code(403);
 			echo "Forbidden";
 			return;
@@ -231,15 +231,15 @@ class AuthController
 		$email = is_string($_POST["email"] ?? null) ? trim($_POST["email"]) : "";
 		$old   = ["email" => $email];
 
-		$error = Validator::validateEmail($email);
+		$error = ValidatorCore::validateEmail($email);
 		if ($error !== null) {
 			$this->renderForgotPassword([$error], $old);
 			return;
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$users    = new User($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$users    = new UserModel($pdo);
 
 		$user = $users->findByEmail($email);
 		if ($user !== null && (int) $user["is_verified"] === 1) {
@@ -247,7 +247,7 @@ class AuthController
 			$expiresAt = (new \DateTimeImmutable("+1 hour"))->format("Y-m-d H:i:s");
 
 			$mailConfig = require __DIR__ . "/../../config/mail.php";
-			$mailer     = new Mailer($mailConfig);
+			$mailer     = new MailerService($mailConfig);
 
 			try {
 				$users->setResetToken((int) $user["id"], $token, $expiresAt);
@@ -264,14 +264,14 @@ class AuthController
 	public function showForgotPasswordSent(): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/forgot_sent", [
+		$view->render("auth/forgot_sentTemplate", [
 			"title" => "Check your inbox",
 		]);
 	}
 
 	public function showResetPassword(): void
 	{
-		Auth::requireGuest();
+		AuthCore::requireGuest();
 
 		$token = is_string($_GET["token"] ?? null) ? trim($_GET["token"]) : "";
 
@@ -285,8 +285,8 @@ class AuthController
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$users    = new User($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$users    = new UserModel($pdo);
 
 		if ($users->findByValidResetToken($token) === null) {
 			$this->renderResetInvalid();
@@ -298,12 +298,12 @@ class AuthController
 
 	public function resetPassword(): void
 	{
-		Auth::requireGuest();
+		AuthCore::requireGuest();
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			http_response_code(403);
 			echo "Forbidden";
 			return;
@@ -323,8 +323,8 @@ class AuthController
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$users    = new User($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$users    = new UserModel($pdo);
 
 		$user = $users->findByValidResetToken($token);
 		if ($user === null) {
@@ -332,7 +332,7 @@ class AuthController
 			return;
 		}
 
-		$errors = Validator::validatePasswordReset($password, $passwordConfirmation);
+		$errors = ValidatorCore::validatePasswordReset($password, $passwordConfirmation);
 		if (!empty($errors)) {
 			$this->renderResetForm($token, $errors, []);
 			return;
@@ -348,7 +348,7 @@ class AuthController
 	private function renderForgotPassword(array $errors, array $old): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/forgot", [
+		$view->render("auth/forgotTemplate", [
 			"title"  => "Reset your password",
 			"errors" => $errors,
 			"old"    => $old,
@@ -358,7 +358,7 @@ class AuthController
 	private function renderResetForm(string $token, array $errors, array $old): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/reset", [
+		$view->render("auth/resetTemplate", [
 			"title"  => "Choose a new password",
 			"token"  => $token,
 			"errors" => $errors,
@@ -369,7 +369,7 @@ class AuthController
 	private function renderResetInvalid(): void
 	{
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("auth/reset_invalid", [
+		$view->render("auth/reset_invalidTemplate", [
 			"title" => "Reset link invalid",
 		]);
 	}

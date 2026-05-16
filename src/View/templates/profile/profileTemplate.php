@@ -5,7 +5,7 @@
  * @var array<string, mixed>    $currentUser  Row from the users table.
  */
 
-use App\Core\Csrf;
+use App\Core\CsrfCore;
 
 $memberSince = date("F j, Y", strtotime($currentUser["created_at"]));
 $hasAvatar   = $currentUser["avatar_path"] !== null && $currentUser["avatar_path"] !== "";
@@ -23,7 +23,6 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		</p>
 	</header>
 
-	<!-- Avatar -->
 	<div class="brutal-card bg-paper text-center mb-6">
 		<p class="font-mono text-xs uppercase tracking-widest opacity-60 mb-5">// Avatar</p>
 
@@ -43,7 +42,7 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		<?php endif; ?>
 
 		<form method="POST" action="/profile/avatar" enctype="multipart/form-data" class="mt-6 text-left space-y-3">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<label for="avatar" class="brutal-label">Upload a new avatar</label>
 			<input
@@ -62,12 +61,11 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		</form>
 	</div>
 
-	<!-- Username -->
 	<div class="brutal-card bg-paper mb-6">
 		<p class="font-mono text-xs uppercase tracking-widest opacity-60 mb-5">// Username</p>
 
 		<form method="POST" action="/profile/username" novalidate class="space-y-3">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<label for="username" class="brutal-label">Username</label>
 			<input
@@ -93,7 +91,7 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		<p class="font-mono text-xs uppercase tracking-widest opacity-60 mb-5">// Email</p>
 
 		<form method="POST" action="/profile/email" novalidate class="space-y-3">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<label for="email" class="brutal-label">Email</label>
 			<input
@@ -113,12 +111,11 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		</form>
 	</div>
 
-	<!-- Password -->
 	<div class="brutal-card bg-paper mb-6">
 		<p class="font-mono text-xs uppercase tracking-widest opacity-60 mb-5">// Password</p>
 
 		<form method="POST" action="/profile/password" novalidate class="space-y-4">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<div>
 				<label for="current_password" class="brutal-label">Current password</label>
@@ -154,12 +151,11 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		</form>
 	</div>
 
-	<!-- Notifications -->
 	<div class="brutal-card bg-paper mb-6">
 		<p class="font-mono text-xs uppercase tracking-widest opacity-60 mb-5">// Preferences</p>
 
 		<form method="POST" action="/profile/notifications" class="space-y-4">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<label class="flex items-start gap-3 cursor-pointer select-none">
 				<input
@@ -170,7 +166,7 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 					class="mt-0.5 w-5 h-5 border-3 border-ink accent-lime cursor-pointer"
 				>
 				<span>
-					<span class="brutal-label !mb-0">Comment notifications</span>
+					<span class="brutal-label !mb-0">CommentModel notifications</span>
 					<span class="block mt-1 font-mono text-xs opacity-70">
 						// receive an email when someone comments on your photos.
 					</span>
@@ -183,7 +179,6 @@ $notifyOn    = (int) $currentUser["notify_comments"] === 1;
 		</form>
 	</div>
 
-	<!-- Meta -->
 	<div class="brutal-card bg-paper">
 		<p class="font-mono text-xs uppercase tracking-widest opacity-60 mb-5">// Meta</p>
 

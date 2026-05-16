@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-class Comment
+class CommentModel
 {
 	public function __construct(private PDO $pdo)
 	{

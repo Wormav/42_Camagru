@@ -6,7 +6,7 @@ namespace App\Model;
 
 use PDO;
 
-class Image
+class ImageModel
 {
 	public function __construct(private PDO $pdo)
 	{

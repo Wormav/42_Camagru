@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Csrf;
-use App\Core\Database;
-use App\Model\Comment;
-use App\Model\Image;
-use App\Model\User;
-use App\Service\Mailer;
+use App\Core\AuthCore;
+use App\Core\CsrfCore;
+use App\Core\DatabaseCore;
+use App\Model\CommentModel;
+use App\Model\ImageModel;
+use App\Model\UserModel;
+use App\Service\MailerService;
 use Throwable;
 
 class CommentController
@@ -19,14 +19,14 @@ class CommentController
 
 	public function create(): void
 	{
-		if (!Auth::check()) {
+		if (!AuthCore::check()) {
 			$this->jsonError(401, "Sign in required.");
 		}
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			$this->jsonError(403, "Invalid CSRF token.");
 		}
 
@@ -37,23 +37,23 @@ class CommentController
 			$this->jsonError(400, "Missing image.");
 		}
 		if ($content === "") {
-			$this->jsonError(400, "Comment cannot be empty.");
+			$this->jsonError(400, "CommentModel cannot be empty.");
 		}
 		if (mb_strlen($content) > self::CONTENT_MAX_LENGTH) {
-			$this->jsonError(400, "Comment is too long (max " . self::CONTENT_MAX_LENGTH . " characters).");
+			$this->jsonError(400, "CommentModel is too long (max " . self::CONTENT_MAX_LENGTH . " characters).");
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
 
-		$images = new Image($pdo);
+		$images = new ImageModel($pdo);
 		$image  = $images->findById($imageId);
 		if ($image === null) {
-			$this->jsonError(404, "Image not found.");
+			$this->jsonError(404, "ImageModel not found.");
 		}
 
-		$commenterId = (int) Auth::id();
-		$comments    = new Comment($pdo);
+		$commenterId = (int) AuthCore::id();
+		$comments    = new CommentModel($pdo);
 		$commentId   = $comments->create($commenterId, $imageId, $content);
 
 		$row = $comments->findByIdEnriched($commentId);
@@ -95,7 +95,7 @@ class CommentController
 			return;
 		}
 
-		$users  = new User($pdo);
+		$users  = new UserModel($pdo);
 		$author = $users->findById($authorId);
 		if ($author === null) {
 			return;
@@ -109,7 +109,7 @@ class CommentController
 
 		try {
 			$mailConfig = require __DIR__ . "/../../config/mail.php";
-			(new Mailer($mailConfig))->sendCommentNotification(
+			(new MailerService($mailConfig))->sendCommentNotification(
 				(string) $author["email"],
 				(string) $author["username"],
 				$commenterUsername,
@@ -123,14 +123,14 @@ class CommentController
 
 	public function delete(): void
 	{
-		if (!Auth::check()) {
+		if (!AuthCore::check()) {
 			$this->jsonError(401, "Sign in required.");
 		}
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			$this->jsonError(403, "Invalid CSRF token.");
 		}
 
@@ -140,15 +140,15 @@ class CommentController
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
 
-		$comments = new Comment($pdo);
+		$comments = new CommentModel($pdo);
 		$comment  = $comments->findById($commentId);
 		if ($comment === null) {
-			$this->jsonError(404, "Comment not found.");
+			$this->jsonError(404, "CommentModel not found.");
 		}
 
-		if ((int) $comment["user_id"] !== (int) Auth::id()) {
+		if ((int) $comment["user_id"] !== (int) AuthCore::id()) {
 			$this->jsonError(403, "You can only delete your own comments.");
 		}
 

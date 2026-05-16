@@ -8,7 +8,7 @@ use PDO;
 use PDOException;
 use RuntimeException;
 
-class Database
+class DatabaseCore
 {
 	private array $config;
 	private ?PDO $pdo = null;
@@ -48,7 +48,7 @@ class Database
 			);
 		} catch (PDOException $e) {
 			throw new RuntimeException(
-				"Database connection failed: " . $e->getMessage(),
+				"DatabaseCore connection failed: " . $e->getMessage(),
 				(int) $e->getCode(),
 				$e,
 			);

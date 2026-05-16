@@ -115,7 +115,7 @@ $pages = $paginationWindow($page, $totalPages);
 			class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
 		>
 			<?php foreach ($items as $item): ?>
-				<?php include __DIR__ . "/_card.php"; ?>
+				<?php include __DIR__ . "/_cardTemplate.php"; ?>
 			<?php endforeach; ?>
 		</ul>
 

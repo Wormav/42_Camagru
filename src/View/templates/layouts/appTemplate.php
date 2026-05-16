@@ -7,9 +7,9 @@
  * @var string|null             $title    Optional page title.
  */
 
-use App\Core\Auth;
-use App\Core\Csrf;
-use App\Core\Flash;
+use App\Core\AuthCore;
+use App\Core\CsrfCore;
+use App\Core\FlashCore;
 
 $currentPath = parse_url($_SERVER["REQUEST_URI"] ?? "/", PHP_URL_PATH) ?: "/";
 
@@ -26,12 +26,12 @@ $navItems = [
 	],
 ];
 
-$isAuth     = Auth::check();
-$username   = Auth::username();
-$avatarPath = Auth::avatarPath();
+$isAuth     = AuthCore::check();
+$username   = AuthCore::username();
+$avatarPath = AuthCore::avatarPath();
 
-$flashSuccess = Flash::get("success");
-$flashError   = Flash::get("error");
+$flashSuccess = FlashCore::get("success");
+$flashError   = FlashCore::get("error");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,7 +39,7 @@ $flashError   = Flash::get("error");
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="#FFF8E1">
-	<meta name="csrf-token" content="<?= $e(Csrf::token()) ?>">
+	<meta name="csrf-token" content="<?= $e(CsrfCore::token()) ?>">
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 	<title><?= $e($title ?? "Camagru") ?></title>
 	<?php if (isset($og) && is_array($og)): ?>
@@ -71,11 +71,9 @@ $flashError   = Flash::get("error");
 </head>
 <body class="min-h-screen flex flex-col">
 
-<!-- Top navigation -->
 <header class="relative z-20 border-b-3 border-ink bg-paper">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
 
-		<!-- Brand -->
 		<a href="/" class="flex items-center gap-3 group shrink-0">
 			<span class="tile bg-lime group-hover:bg-pink transition-colors">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" aria-hidden="true">
@@ -87,7 +85,6 @@ $flashError   = Flash::get("error");
 			<span class="font-display font-black text-2xl sm:text-3xl tracking-tight">Camagru</span>
 		</a>
 
-		<!-- Desktop center nav -->
 		<nav class="hidden md:flex items-center gap-2">
 			<?php foreach ($navItems as $item): ?>
 				<a
@@ -100,7 +97,6 @@ $flashError   = Flash::get("error");
 			<?php endforeach; ?>
 		</nav>
 
-		<!-- Desktop right actions -->
 		<div class="hidden md:flex items-center gap-3">
 			<?php if ($isAuth): ?>
 				<a href="/profile" class="block shrink-0 transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5" title="Your profile" aria-label="Your profile">
@@ -116,7 +112,7 @@ $flashError   = Flash::get("error");
 					<?php endif; ?>
 				</a>
 				<form method="POST" action="/logout" class="inline-block">
-					<?= Csrf::field() ?>
+					<?= CsrfCore::field() ?>
 					<button type="submit" class="btn-brutal btn-brutal--coral !py-2 !px-3 text-sm">
 						Sign out
 					</button>
@@ -131,7 +127,6 @@ $flashError   = Flash::get("error");
 			<?php endif; ?>
 		</div>
 
-		<!-- Mobile burger toggle (pure CSS via <details>) -->
 		<details class="md:hidden">
 			<summary class="list-none cursor-pointer tile bg-paper border-3 border-ink shadow-brutal-sm hover:bg-lime transition-colors" aria-label="Open menu">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6" aria-hidden="true">
@@ -141,7 +136,6 @@ $flashError   = Flash::get("error");
 				</svg>
 			</summary>
 
-			<!-- Full-bleed mobile drawer -->
 			<div class="fixed inset-x-0 top-[5rem] bg-paper border-b-3 border-ink shadow-brutal-sm px-4 sm:px-6 py-5 flex flex-col gap-2 z-30">
 				<?php foreach ($navItems as $item): ?>
 					<a
@@ -170,7 +164,7 @@ $flashError   = Flash::get("error");
 						<span class="font-display font-bold text-sm uppercase truncate"><?= $e($username) ?></span>
 					</a>
 					<form method="POST" action="/logout">
-						<?= Csrf::field() ?>
+						<?= CsrfCore::field() ?>
 						<button type="submit" class="btn-brutal btn-brutal--coral w-full !py-2 text-sm">
 							Sign out
 						</button>
@@ -192,7 +186,6 @@ $flashError   = Flash::get("error");
 	<?= $content ?>
 </main>
 
-
 <?php if ($flashSuccess !== null || $flashError !== null): ?>
 	<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-[calc(100%-3rem)] sm:w-auto pointer-events-none">
 		<?php if ($flashSuccess !== null): ?>
@@ -210,11 +203,9 @@ $flashError   = Flash::get("error");
 	</div>
 <?php endif; ?>
 
-<!-- Footer -->
 <footer class="relative z-10 border-t-3 border-ink bg-dark text-paper mt-24">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 md:grid-cols-12 gap-8">
 
-		<!-- Brand column -->
 		<div class="col-span-2 md:col-span-5">
 			<div class="flex items-center gap-3">
 				<span class="tile bg-lime !shadow-none">
@@ -231,7 +222,6 @@ $flashError   = Flash::get("error");
 			</p>
 		</div>
 
-		<!-- Product -->
 		<div class="col-span-1 md:col-span-2">
 			<p class="font-display font-black text-sm uppercase mb-3">Product</p>
 			<ul class="space-y-2 text-sm font-medium text-paper/70">
@@ -243,7 +233,6 @@ $flashError   = Flash::get("error");
 			</ul>
 		</div>
 
-		<!-- Account -->
 		<div class="col-span-1 md:col-span-2">
 			<p class="font-display font-black text-sm uppercase mb-3">Account</p>
 			<ul class="space-y-2 text-sm font-medium text-paper/70">
@@ -256,7 +245,6 @@ $flashError   = Flash::get("error");
 			</ul>
 		</div>
 
-		<!-- Stack -->
 		<div class="col-span-2 md:col-span-3">
 			<p class="font-display font-black text-sm uppercase mb-3">Stack</p>
 			<ul class="space-y-2 text-sm font-mono text-paper/70">
@@ -268,7 +256,6 @@ $flashError   = Flash::get("error");
 		</div>
 	</div>
 
-	<!-- Bottom strip -->
 	<div class="border-t-3 border-paper/20">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono uppercase text-paper/60">
 			<p>© <?= date("Y") ?> Camagru — All rights reserved</p>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Auth
+class AuthCore
 {
 	private const KEY_USER_ID     = "user_id";
 	private const KEY_USERNAME    = "username";
@@ -12,28 +12,28 @@ class Auth
 
 	public static function check(): bool
 	{
-		Session::start();
-		return Session::has(self::KEY_USER_ID);
+		SessionCore::start();
+		return SessionCore::has(self::KEY_USER_ID);
 	}
 
 	public static function id(): ?int
 	{
-		Session::start();
-		$id = Session::get(self::KEY_USER_ID);
+		SessionCore::start();
+		$id = SessionCore::get(self::KEY_USER_ID);
 		return is_int($id) ? $id : null;
 	}
 
 	public static function username(): ?string
 	{
-		Session::start();
-		$username = Session::get(self::KEY_USERNAME);
+		SessionCore::start();
+		$username = SessionCore::get(self::KEY_USERNAME);
 		return is_string($username) ? $username : null;
 	}
 
 	public static function avatarPath(): ?string
 	{
-		Session::start();
-		$path = Session::get(self::KEY_AVATAR_PATH);
+		SessionCore::start();
+		$path = SessionCore::get(self::KEY_AVATAR_PATH);
 		return is_string($path) && $path !== "" ? $path : null;
 	}
 

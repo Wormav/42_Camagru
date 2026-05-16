@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Csrf;
-use App\Core\Database;
-use App\Core\Validator;
-use App\Model\Image;
-use App\Service\ImageComposer;
+use App\Core\AuthCore;
+use App\Core\CsrfCore;
+use App\Core\DatabaseCore;
+use App\Core\ValidatorCore;
+use App\Model\ImageModel;
+use App\Service\ImageComposerService;
 use App\View\View;
 
 class PostController
@@ -19,15 +19,15 @@ class PostController
 
 	public function showPost(): void
 	{
-		Auth::requireAuth();
+		AuthCore::requireAuth();
 
 		$overlays = require __DIR__ . "/../../config/overlays.php";
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo = (new Database($dbConfig))->connection();
-		$userImages = (new Image($pdo))->findByUserId((int) Auth::id());
+		$pdo = (new DatabaseCore($dbConfig))->connection();
+		$userImages = (new ImageModel($pdo))->findByUserId((int) AuthCore::id());
 
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("post/post", [
+		$view->render("post/postTemplate", [
 			"title"    => "Post",
 			"scripts"  => ["/dist/post.bundle.js"],
 			"overlays" => $overlays,
@@ -37,12 +37,12 @@ class PostController
 
 	public function capture(): void
 	{
-		Auth::requireAuth();
+		AuthCore::requireAuth();
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			$this->jsonError(403, "Invalid CSRF token.");
 		}
 
@@ -58,14 +58,14 @@ class PostController
 			$this->jsonError(400, "No snap submitted.");
 		}
 
-		$validationError = Validator::validateSnapUpload($file);
+		$validationError = ValidatorCore::validateSnapUpload($file);
 		if ($validationError !== null) {
 			$this->jsonError(400, $validationError);
 		}
 
 		$overlayAbsPath = __DIR__ . "/../../public" . $overlay["path"];
 
-		$composer = new ImageComposer();
+		$composer = new ImageComposerService();
 		$fileName = $composer->merge($file["tmp_name"], $overlayAbsPath, self::SNAPS_DIR);
 		if ($fileName === null) {
 			$this->jsonError(500, "Failed to compose snap.");
@@ -73,8 +73,8 @@ class PostController
 
 		$publicPath = self::SNAPS_PUBLIC_PREFIX . $fileName;
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo = (new Database($dbConfig))->connection();
-		$imageId = (new Image($pdo))->create((int) Auth::id(), $publicPath, $overlay["id"]);
+		$pdo = (new DatabaseCore($dbConfig))->connection();
+		$imageId = (new ImageModel($pdo))->create((int) AuthCore::id(), $publicPath, $overlay["id"]);
 
 		$this->jsonSuccess([
 			"image_id"   => $imageId,
@@ -85,12 +85,12 @@ class PostController
 
 	public function delete(): void
 	{
-		Auth::requireAuth();
+		AuthCore::requireAuth();
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			$this->jsonError(403, "Invalid CSRF token.");
 		}
 
@@ -100,14 +100,14 @@ class PostController
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo = (new Database($dbConfig))->connection();
-		$images = new Image($pdo);
+		$pdo = (new DatabaseCore($dbConfig))->connection();
+		$images = new ImageModel($pdo);
 
 		$image = $images->findById($imageId);
 		if ($image === null) {
-			$this->jsonError(404, "Image not found.");
+			$this->jsonError(404, "ImageModel not found.");
 		}
-		if ((int) $image["user_id"] !== (int) Auth::id()) {
+		if ((int) $image["user_id"] !== (int) AuthCore::id()) {
 			$this->jsonError(403, "Forbidden.");
 		}
 

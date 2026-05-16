@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Database;
-use App\Model\Comment;
-use App\Model\Image;
+use App\Core\AuthCore;
+use App\Core\DatabaseCore;
+use App\Model\CommentModel;
+use App\Model\ImageModel;
 use App\View\View;
 
 class GalleryController
@@ -17,8 +17,8 @@ class GalleryController
 	public function showGallery(): void
 	{
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$images   = new Image($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$images   = new ImageModel($pdo);
 
 		$total      = $images->countAll();
 		$totalPages = max(1, (int) ceil($total / self::PER_PAGE));
@@ -32,18 +32,18 @@ class GalleryController
 		}
 
 		$offset        = ($page - 1) * self::PER_PAGE;
-		$currentUserId = Auth::id();
+		$currentUserId = AuthCore::id();
 		$items         = $images->findFeed(self::PER_PAGE, $offset, $currentUserId);
 
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("gallery/gallery", [
+		$view->render("gallery/galleryTemplate", [
 			"title"         => "Gallery",
 			"scripts"       => ["/dist/gallery.bundle.js"],
 			"items"         => $items,
 			"total"         => $total,
 			"page"          => $page,
 			"totalPages"    => $totalPages,
-			"isAuth"        => Auth::check(),
+			"isAuth"        => AuthCore::check(),
 			"currentUserId" => $currentUserId,
 		]);
 	}
@@ -51,8 +51,8 @@ class GalleryController
 	public function feedJson(): void
 	{
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$images   = new Image($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$images   = new ImageModel($pdo);
 
 		$total      = $images->countAll();
 		$totalPages = max(1, (int) ceil($total / self::PER_PAGE));
@@ -75,15 +75,15 @@ class GalleryController
 		}
 
 		$offset        = ($page - 1) * self::PER_PAGE;
-		$currentUserId = Auth::id();
+		$currentUserId = AuthCore::id();
 		$items         = $images->findFeed(self::PER_PAGE, $offset, $currentUserId);
-		$isAuth        = Auth::check();
+		$isAuth        = AuthCore::check();
 
 		$e = static fn (mixed $v): string => htmlspecialchars((string) $v, ENT_QUOTES, "UTF-8");
 
 		ob_start();
 		foreach ($items as $item) {
-			include __DIR__ . "/../View/templates/gallery/_card.php";
+			include __DIR__ . "/../View/templates/gallery/_cardTemplate.php";
 		}
 		$html = (string) ob_get_clean();
 
@@ -104,10 +104,10 @@ class GalleryController
 		}
 
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
 
-		$currentUserId = Auth::id();
-		$images        = new Image($pdo);
+		$currentUserId = AuthCore::id();
+		$images        = new ImageModel($pdo);
 
 		$item = $images->findOneEnriched($imageId, $currentUserId);
 		if ($item === null) {
@@ -115,7 +115,7 @@ class GalleryController
 			exit;
 		}
 
-		$comments = (new Comment($pdo))->findByImageId($imageId);
+		$comments = (new CommentModel($pdo))->findByImageId($imageId);
 
 		$scheme = (
 			(!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off")
@@ -142,12 +142,12 @@ class GalleryController
 		];
 
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("gallery/detail", [
+		$view->render("gallery/detailTemplate", [
 			"title"         => "Snap by @" . $item["username"],
 			"scripts"       => ["/dist/gallery.bundle.js"],
 			"item"          => $item,
 			"comments"      => $comments,
-			"isAuth"        => Auth::check(),
+			"isAuth"        => AuthCore::check(),
 			"currentUserId" => $currentUserId,
 			"og"            => $og,
 			"share"         => $share,

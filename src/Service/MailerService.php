@@ -6,7 +6,7 @@ namespace App\Service;
 
 use RuntimeException;
 
-class Mailer
+class MailerService
 {
 	public function __construct(private array $config)
 	{

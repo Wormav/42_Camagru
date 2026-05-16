@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Core\Filename;
+use App\Core\FilenameCore;
 
-class ImageComposer
+class ImageComposerService
 {
 	public function __construct(private int $jpegQuality = 90)
 	{
@@ -51,7 +51,7 @@ class ImageComposer
 		);
 
 
-		$fileName =  Filename::randomized("jpg", "snap_");
+		$fileName =  FilenameCore::randomized("jpg", "snap_");
 		$finalPath = $snapsDirectory . DIRECTORY_SEPARATOR . $fileName;
 		$tempPath = $finalPath . ".tmp";
 

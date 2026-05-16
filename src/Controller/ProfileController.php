@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Csrf;
-use App\Core\Database;
-use App\Core\Flash;
-use App\Core\Session;
-use App\Core\Validator;
-use App\Model\User;
+use App\Core\AuthCore;
+use App\Core\CsrfCore;
+use App\Core\DatabaseCore;
+use App\Core\FlashCore;
+use App\Core\SessionCore;
+use App\Core\ValidatorCore;
+use App\Model\UserModel;
 use App\View\View;
 
 class ProfileController
@@ -26,20 +26,20 @@ class ProfileController
 
 	public function showProfile(): void
 	{
-		Auth::requireAuth();
+		AuthCore::requireAuth();
 
 		[, $currentUser] = $this->loadCurrentUser();
 
 		$dbAvatar = is_string($currentUser["avatar_path"] ?? null) ? $currentUser["avatar_path"] : null;
-		if (Session::get("avatar_path") !== $dbAvatar) {
-			Session::set("avatar_path", $dbAvatar);
+		if (SessionCore::get("avatar_path") !== $dbAvatar) {
+			SessionCore::set("avatar_path", $dbAvatar);
 		}
-		if (Session::get("username") !== $currentUser["username"]) {
-			Session::set("username", $currentUser["username"]);
+		if (SessionCore::get("username") !== $currentUser["username"]) {
+			SessionCore::set("username", $currentUser["username"]);
 		}
 
 		$view = new View(__DIR__ . "/../View/templates");
-		$view->render("profile/profile", [
+		$view->render("profile/profileTemplate", [
 			"title"       => "Profile",
 			"currentUser" => $currentUser,
 		]);
@@ -51,9 +51,9 @@ class ProfileController
 
 		$newUsername = is_string($_POST["username"] ?? null) ? trim($_POST["username"]) : "";
 
-		$error = Validator::validateUsername($newUsername);
+		$error = ValidatorCore::validateUsername($newUsername);
 		if ($error !== null) {
-			Flash::error($error);
+			FlashCore::error($error);
 			$this->redirectToProfile();
 		}
 
@@ -62,14 +62,14 @@ class ProfileController
 		}
 
 		if ($users->findByUsername($newUsername) !== null) {
-			Flash::error("This username is already taken.");
+			FlashCore::error("This username is already taken.");
 			$this->redirectToProfile();
 		}
 
 		$users->updateUsername((int) $currentUser["id"], $newUsername);
-		Session::set("username", $newUsername);
+		SessionCore::set("username", $newUsername);
 
-		Flash::success("Username updated.");
+		FlashCore::success("Username updated.");
 		$this->redirectToProfile();
 	}
 
@@ -79,9 +79,9 @@ class ProfileController
 
 		$newEmail = is_string($_POST["email"] ?? null) ? trim($_POST["email"]) : "";
 
-		$error = Validator::validateEmail($newEmail);
+		$error = ValidatorCore::validateEmail($newEmail);
 		if ($error !== null) {
-			Flash::error($error);
+			FlashCore::error($error);
 			$this->redirectToProfile();
 		}
 
@@ -90,13 +90,13 @@ class ProfileController
 		}
 
 		if ($users->findByEmail($newEmail) !== null) {
-			Flash::error("This email is already taken.");
+			FlashCore::error("This email is already taken.");
 			$this->redirectToProfile();
 		}
 
 		$users->updateEmail((int) $currentUser["id"], $newEmail);
 
-		Flash::success("Email updated.");
+		FlashCore::success("Email updated.");
 		$this->redirectToProfile();
 	}
 
@@ -108,25 +108,25 @@ class ProfileController
 		$new     = is_string($_POST["new_password"] ?? null) ? $_POST["new_password"] : "";
 
 		if ($current === "" || !password_verify($current, $currentUser["password"])) {
-			Flash::error("Your current password is incorrect.");
+			FlashCore::error("Your current password is incorrect.");
 			$this->redirectToProfile();
 		}
 
-		$error = Validator::validatePassword($new);
+		$error = ValidatorCore::validatePassword($new);
 		if ($error !== null) {
-			Flash::error($error);
+			FlashCore::error($error);
 			$this->redirectToProfile();
 		}
 
 		if (password_verify($new, $currentUser["password"])) {
-			Flash::error("New password must be different from the current one.");
+			FlashCore::error("New password must be different from the current one.");
 			$this->redirectToProfile();
 		}
 
 		$hash = password_hash($new, PASSWORD_BCRYPT);
 		$users->updatePassword((int) $currentUser["id"], $hash);
 
-		Flash::success("Password updated.");
+		FlashCore::success("Password updated.");
 		$this->redirectToProfile();
 	}
 
@@ -137,9 +137,9 @@ class ProfileController
 		$notify = isset($_POST["notify_comments"]) && $_POST["notify_comments"] === "1";
 		$users->updateNotifyComments((int) $currentUser["id"], $notify);
 
-		Flash::success($notify
-			? "Comment notifications enabled."
-			: "Comment notifications disabled.");
+		FlashCore::success($notify
+			? "CommentModel notifications enabled."
+			: "CommentModel notifications disabled.");
 		$this->redirectToProfile();
 	}
 
@@ -149,20 +149,20 @@ class ProfileController
 
 		$file = $_FILES["avatar"] ?? null;
 		if (!is_array($file)) {
-			Flash::error("No avatar file submitted.");
+			FlashCore::error("No avatar file submitted.");
 			$this->redirectToProfile();
 		}
 
-		$validationError = Validator::validateAvatarUpload($file);
+		$validationError = ValidatorCore::validateAvatarUpload($file);
 		if ($validationError !== null) {
-			Flash::error($validationError);
+			FlashCore::error($validationError);
 			$this->redirectToProfile();
 		}
 
 		$tmpPath = $file["tmp_name"];
 		$mime    = mime_content_type($tmpPath);
 		if ($mime === false || !isset(self::AVATAR_MIME_TO_EXT[$mime])) {
-			Flash::error("Avatar must be a JPEG, PNG or WebP image.");
+			FlashCore::error("Avatar must be a JPEG, PNG or WebP image.");
 			$this->redirectToProfile();
 		}
 
@@ -176,7 +176,7 @@ class ProfileController
 		}
 
 		if (!move_uploaded_file($tmpPath, $absolutePath)) {
-			Flash::error("Could not save your avatar. Please try again.");
+			FlashCore::error("Could not save your avatar. Please try again.");
 			$this->redirectToProfile();
 		}
 
@@ -189,20 +189,20 @@ class ProfileController
 		}
 
 		$users->updateAvatar((int) $currentUser["id"], $publicPath);
-		Session::set("avatar_path", $publicPath);
+		SessionCore::set("avatar_path", $publicPath);
 
-		Flash::success("Avatar updated.");
+		FlashCore::success("Avatar updated.");
 		$this->redirectToProfile();
 	}
 
 	private function guard(): array
 	{
-		Auth::requireAuth();
+		AuthCore::requireAuth();
 
-		$submittedToken = is_string($_POST[Csrf::fieldName()] ?? null)
-			? $_POST[Csrf::fieldName()]
+		$submittedToken = is_string($_POST[CsrfCore::fieldName()] ?? null)
+			? $_POST[CsrfCore::fieldName()]
 			: "";
-		if (!Csrf::validate($submittedToken)) {
+		if (!CsrfCore::validate($submittedToken)) {
 			http_response_code(403);
 			echo "Forbidden";
 			exit;
@@ -214,12 +214,12 @@ class ProfileController
 	private function loadCurrentUser(): array
 	{
 		$dbConfig = require __DIR__ . "/../../config/database.php";
-		$pdo      = (new Database($dbConfig))->connection();
-		$users    = new User($pdo);
+		$pdo      = (new DatabaseCore($dbConfig))->connection();
+		$users    = new UserModel($pdo);
 
-		$currentUser = $users->findById((int) Auth::id());
+		$currentUser = $users->findById((int) AuthCore::id());
 		if ($currentUser === null) {
-			Session::destroy();
+			SessionCore::destroy();
 			header("Location: /login");
 			exit;
 		}

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Env
+class EnvCore
 {
 	private static array $values = [];
 	private static bool $loaded = false;
@@ -16,7 +16,7 @@ class Env
 		}
 
 		if (!is_file($path)) {
-			throw new \RuntimeException("Env file not found: {$path}");
+			throw new \RuntimeException("EnvCore file not found: {$path}");
 		}
 
 		$lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

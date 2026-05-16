@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Validator
+class ValidatorCore
 {
 	public static function validateEmail(string $email): ?string
 	{

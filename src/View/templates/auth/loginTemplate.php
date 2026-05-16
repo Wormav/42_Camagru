@@ -8,7 +8,7 @@
  * @var array<string, string>   $old     Previously submitted values (username only — never the password).
  */
 
-use App\Core\Csrf;
+use App\Core\CsrfCore;
 
 ?>
 <section class="max-w-xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
@@ -35,7 +35,7 @@ use App\Core\Csrf;
 		<?php endif; ?>
 
 		<form id="login-form" method="POST" action="/login" novalidate class="space-y-5">
-			<?= Csrf::field() ?>
+			<?= CsrfCore::field() ?>
 
 			<div>
 				<label for="username" class="brutal-label">Username</label>
