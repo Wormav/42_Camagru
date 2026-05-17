@@ -6,6 +6,8 @@ namespace App\Core;
 
 class SecurityHeadersCore
 {
+	// CSP + Permissions-Policy + Referrer-Policy only origin white list
+	// X-Frame-Options + frame-ancestors + CSRF token + form-action only site can submit forms and be framed
 	public static function send(): void
 	{
 		if (headers_sent()) {
@@ -20,17 +22,18 @@ class SecurityHeadersCore
 
 		header("Permissions-Policy: geolocation=(), payment=(), usb=()");
 
-		$csp = "default-src 'self'; "
-			. "script-src 'self'; "
-			. "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-			. "img-src 'self' data: blob:; "
-			. "media-src 'self' blob:; "
-			. "font-src 'self' data: https://fonts.gstatic.com; "
-			. "connect-src 'self'; "
-			. "object-src 'none'; "
-			. "base-uri 'self'; "
-			. "form-action 'self'; "
-			. "frame-ancestors 'none'";
+		$csp =
+			"default-src 'self'; " .
+			"script-src 'self'; " .
+			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
+			"img-src 'self' data: blob:; " .
+			"media-src 'self' blob:; " .
+			"font-src 'self' data: https://fonts.gstatic.com; " .
+			"connect-src 'self'; " .
+			"object-src 'none'; " .
+			"base-uri 'self'; " .
+			"form-action 'self'; " .
+			"frame-ancestors 'none'";
 		header("Content-Security-Policy: " . $csp);
 	}
 }

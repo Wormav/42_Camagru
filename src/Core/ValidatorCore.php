@@ -63,10 +63,8 @@ class ValidatorCore
 		return null;
 	}
 
-	public static function validatePasswordReset(
-		string $password,
-		string $passwordConfirmation,
-	): array {
+	public static function validatePasswordReset(string $password, string $passwordConfirmation): array
+	{
 		$errors = [];
 		if ($error = self::validatePassword($password)) {
 			$errors[] = $error;
@@ -110,7 +108,7 @@ class ValidatorCore
 		}
 
 		$maxSize = 5 * 1024 * 1024; // 5 MB
-		$size    = is_int($file["size"] ?? null) ? $file["size"] : 0;
+		$size = is_int($file["size"] ?? null) ? $file["size"] : 0;
 		if ($size <= 0 || $size > $maxSize) {
 			return "Avatar must be 5MB or smaller.";
 		}
@@ -140,7 +138,7 @@ class ValidatorCore
 		}
 
 		$maxSize = 10 * 1024 * 1024; // 10 MB — accommodates high-res webcams
-		$size    = is_int($file["size"] ?? null) ? $file["size"] : 0;
+		$size = is_int($file["size"] ?? null) ? $file["size"] : 0;
 		if ($size <= 0 || $size > $maxSize) {
 			return "Snap must be 10MB or smaller.";
 		}

@@ -8,13 +8,11 @@ use App\Core\FilenameCore;
 
 class ImageComposerService
 {
-	public function __construct(private int $jpegQuality = 90)
-	{
-	}
+	public function __construct(private int $jpegQuality = 90) {}
 
+	// Load the base image (JPEG) and the overlay (PNG), merge them, and save the result as a new JPEG file in the snaps directory.
 	public function merge(string $basePath, ?string $overlayPath, string $snapsDirectory): ?string
 	{
-
 		if (!is_file($basePath) || !is_readable($basePath)) {
 			return null;
 		}
@@ -55,8 +53,7 @@ class ImageComposerService
 			);
 		}
 
-
-		$fileName =  FilenameCore::randomized("jpg", "snap_");
+		$fileName = FilenameCore::randomized("jpg", "snap_");
 		$finalPath = $snapsDirectory . DIRECTORY_SEPARATOR . $fileName;
 		$tempPath = $finalPath . ".tmp";
 
@@ -70,5 +67,4 @@ class ImageComposerService
 		}
 		return $fileName;
 	}
-
 }

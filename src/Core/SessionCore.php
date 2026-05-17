@@ -6,6 +6,7 @@ namespace App\Core;
 
 class SessionCore
 {
+	// Start session whidt secure cookie settings if not already started
 	public static function start(): void
 	{
 		if (session_status() === PHP_SESSION_ACTIVE) {
@@ -14,9 +15,9 @@ class SessionCore
 
 		session_set_cookie_params([
 			"lifetime" => 0,
-			"path"     => "/",
-			"domain"   => "",
-			"secure"   => !empty($_SERVER["HTTPS"]),
+			"path" => "/",
+			"domain" => "",
+			"secure" => !empty($_SERVER["HTTPS"]),
 			"httponly" => true,
 			"samesite" => "Lax",
 		]);
@@ -34,6 +35,7 @@ class SessionCore
 		return $_SESSION[$key] ?? $default;
 	}
 
+	// Check if a session key exists
 	public static function has(string $key): bool
 	{
 		return isset($_SESSION[$key]);
@@ -49,6 +51,7 @@ class SessionCore
 		session_unset();
 	}
 
+	// Regenerate session ID to prevent fixation attacks
 	public static function regenerate(): void
 	{
 		if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -67,18 +70,14 @@ class SessionCore
 
 		if (ini_get("session.use_cookies")) {
 			$params = session_get_cookie_params();
-			setcookie(
-				session_name(),
-				"",
-				[
-					"expires"  => time() - 42000,
-					"path"     => $params["path"],
-					"domain"   => $params["domain"],
-					"secure"   => $params["secure"],
-					"httponly" => $params["httponly"],
-					"samesite" => $params["samesite"],
-				],
-			);
+			setcookie(session_name(), "", [
+				"expires" => time() - 42000,
+				"path" => $params["path"],
+				"domain" => $params["domain"],
+				"secure" => $params["secure"],
+				"httponly" => $params["httponly"],
+				"samesite" => $params["samesite"],
+			]);
 		}
 
 		session_destroy();
