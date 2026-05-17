@@ -1,13 +1,4 @@
 <?php
-/**
- * Sign-in form (GET /login).
- *
- * @var \Closure(mixed): string $e       Escape helper.
- * @var string                  $title   Page title.
- * @var array<int, string>      $errors  Server-side validation errors.
- * @var array<string, string>   $old     Previously submitted values (username only — never the password).
- */
-
 use App\Core\CsrfCore;
 
 ?>

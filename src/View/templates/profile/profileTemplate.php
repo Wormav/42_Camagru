@@ -1,10 +1,4 @@
 <?php
-/**
- * @var \Closure(mixed): string $e            Escape helper.
- * @var string                  $title        Page title.
- * @var array<string, mixed>    $currentUser  Row from the users table.
- */
-
 use App\Core\CsrfCore;
 
 $memberSince = date("F j, Y", strtotime($currentUser["created_at"]));

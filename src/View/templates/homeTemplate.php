@@ -1,14 +1,4 @@
 <?php
-/**
- * Landing page — neo-brutalist hero, snap mosaic, features, stats, CTA.
- *
- * @var \Closure(mixed): string $e            Escape helper.
- * @var string                  $title        Page title.
- * @var int                     $totalSnaps   Total snaps in the DB.
- * @var int                     $totalCreators Total distinct creators.
- * @var bool                    $isAuth       Whether the visitor is signed in.
- */
-
 ?>
 <section class="relative overflow-hidden bg-paper">
 	<div aria-hidden="true" class="absolute -top-10 -left-10 w-40 h-40 bg-lime border-3 border-ink rotate-[-12deg] hidden md:block"></div>

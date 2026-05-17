@@ -1,25 +1,4 @@
 <?php
-/**
- * ImageModel detail — single snap with likes and comments.
- *
- * @var \Closure(mixed): string $e          Escape helper.
- * @var string                  $title      Page title.
- * @var array{
- *     id:int,
- *     user_id:int,
- *     image_path:string,
- *     overlay_used:?string,
- *     created_at:string,
- *     username:string,
- *     like_count:int,
- *     comment_count:int,
- *     user_has_liked:int
- * } $item
- * @var array<int,array{id:int,image_id:int,user_id:int,content:string,created_at:string,username:string}> $comments
- * @var bool      $isAuth
- * @var int|null  $currentUserId
- */
-
 use App\Core\CsrfCore;
 
 $liked       = (int) ($item["user_has_liked"] ?? 0) === 1;

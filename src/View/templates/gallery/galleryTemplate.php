@@ -1,27 +1,4 @@
 <?php
-/**
- * Public gallery — paginated grid of all user snaps.
- *
- * @var \Closure(mixed): string $e          Escape helper.
- * @var string                  $title      Page title.
- * @var array<int,array{
- *     id:int,
- *     user_id:int,
- *     image_path:string,
- *     overlay_used:?string,
- *     created_at:string,
- *     username:string,
- *     like_count:int,
- *     comment_count:int,
- *     user_has_liked:int
- * }> $items
- * @var int       $total          Total images in DB.
- * @var int       $page           Current page (1-based, already clamped).
- * @var int       $totalPages     Total pages (at least 1).
- * @var bool      $isAuth         True if a user is currently logged in.
- * @var int|null  $currentUserId  Logged-in user id (null for visitors).
- */
-
 $pageUrl = static function (int $n): string {
 	return "/gallery?page=" . $n;
 };

@@ -1,13 +1,4 @@
 <?php
-/**
- * Sign-up form (GET /register).
- *
- * @var \Closure(mixed): string $e       Escape helper.
- * @var string                  $title   Page title.
- * @var array<int, string>      $errors  Server-side validation errors.
- * @var array<string, string>   $old     Previously submitted values.
- */
-
 use App\Core\CsrfCore;
 
 ?>

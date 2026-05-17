@@ -1,14 +1,4 @@
 <?php
-/**
- * New-password form (GET /reset/confirm?token=...).
- *
- * @var \Closure(mixed): string $e       Escape helper.
- * @var string                  $title   Page title.
- * @var string                  $token   Reset token (passed through the form).
- * @var array<int, string>      $errors  Server-side validation errors.
- * @var array<string, string>   $old     Previously submitted values (unused — we never echo passwords).
- */
-
 use App\Core\CsrfCore;
 
 ?>

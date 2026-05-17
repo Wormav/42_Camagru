@@ -1,11 +1,4 @@
 <?php
-/**
- * Default application layout — Neo-brutalist aesthetic.
- *
- * @var \Closure(mixed): string $e        Escape helper.
- * @var string                  $content  Page HTML rendered by App\View\View.
- * @var string|null             $title    Optional page title.
- */
 
 use App\Core\AuthCore;
 use App\Core\CsrfCore;

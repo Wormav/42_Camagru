@@ -1,10 +1,4 @@
 <?php
-/**
- * Post forgot-password confirmation page (GET /reset/sent).
- *
- * @var \Closure(mixed): string $e      Escape helper.
- * @var string                  $title  Page title.
- */
 ?>
 <section class="max-w-xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
 

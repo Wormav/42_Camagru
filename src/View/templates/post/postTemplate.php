@@ -1,10 +1,4 @@
 <?php
-/**
- * @var \Closure(mixed): string $e         Escape helper.
- * @var string                  $title     Page title.
- * @var array<string,array{id:string,label:string,path:string}> $overlays
- * @var array<int,array{id:int,user_id:int,image_path:string,overlay_used:?string,created_at:string}> $userImages
- */
 $imageCount = count($userImages);
 ?>
 <section class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
