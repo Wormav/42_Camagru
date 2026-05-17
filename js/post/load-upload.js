@@ -22,6 +22,7 @@ window.Camagru.post.loadUpload = (file) => {
 			window.Camagru.post.state.sourceMode = "image";
 			window.Camagru.post.redrawUpload();
 			window.Camagru.post.showSource("image");
+			window.Camagru.post.updateCaptureButton();
 		}, { once: true });
 		imageEl.src = dataUrl;
 	});

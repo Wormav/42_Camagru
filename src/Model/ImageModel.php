@@ -12,7 +12,7 @@ class ImageModel
 	{
 	}
 
-	public function create(int $userId, string $imagePath, string $overlayUsed): int
+	public function create(int $userId, string $imagePath, ?string $overlayUsed): int
 	{
 		$stmt = $this->pdo->prepare(
 			"INSERT INTO images (user_id, image_path, overlay_used)

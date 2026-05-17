@@ -29,6 +29,7 @@ window.Camagru.post.startWebcam = async () => {
 		window.Camagru.post.state.sourceMode = "webcam";
 		window.Camagru.post.showSource("webcam");
 		window.Camagru.post.startPreviewLoop();
+		window.Camagru.post.updateCaptureButton();
 	} catch (error) {
 		console.warn("[post] getUserMedia failed:", error);
 

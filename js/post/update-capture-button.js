@@ -3,7 +3,8 @@ window.Camagru.post.updateCaptureButton = () => {
 	if (captureBtn === null) {
 		return;
 	}
-	if (window.Camagru.post.state.selectedOverlayId === null) {
+
+	if (window.Camagru.post.detectSource() === null) {
 		captureBtn.setAttribute("disabled", "");
 		captureBtn.setAttribute("aria-disabled", "true");
 	} else {

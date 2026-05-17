@@ -10,5 +10,5 @@ return [
 	"username" => EnvCore::get("MAIL_USERNAME", ""),
 	"password" => EnvCore::get("MAIL_PASSWORD", ""),
 	"from"     => EnvCore::get("MAIL_FROM", "no-reply@camagru.local"),
-	"app_url"  => EnvCore::get("APP_URL", "http://localhost:8000"),
+	"app_url"  => EnvCore::get("APP_URL", "http://localhost:8080"),
 ];

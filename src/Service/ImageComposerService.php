@@ -12,43 +12,48 @@ class ImageComposerService
 	{
 	}
 
-	public function merge(string $basePath, string $overlayPath, string $snapsDirectory): ?string
+	public function merge(string $basePath, ?string $overlayPath, string $snapsDirectory): ?string
 	{
 
 		if (!is_file($basePath) || !is_readable($basePath)) {
 			return null;
 		}
-		if (!is_file($overlayPath) || !is_readable($overlayPath)) {
-			return null;
-		}
 
 		$base = imagecreatefromjpeg($basePath);
-		$overlay = imagecreatefrompng($overlayPath);
-
-		if (!$base || !$overlay) {
+		if (!$base) {
 			return null;
 		}
-
-		imagealphablending($overlay, false);
-		imagesavealpha($overlay, true);
-		imagealphablending($base, true);
 
 		if (!is_dir($snapsDirectory) || !is_writable($snapsDirectory)) {
 			return null;
 		}
 
-		imagecopyresampled(
-			$base,
-			$overlay,
-			0,
-			0,
-			0,
-			0,
-			imagesx($base),
-			imagesy($base),
-			imagesx($overlay),
-			imagesy($overlay),
-		);
+		if ($overlayPath !== null) {
+			if (!is_file($overlayPath) || !is_readable($overlayPath)) {
+				return null;
+			}
+			$overlay = imagecreatefrompng($overlayPath);
+			if (!$overlay) {
+				return null;
+			}
+
+			imagealphablending($overlay, false);
+			imagesavealpha($overlay, true);
+			imagealphablending($base, true);
+
+			imagecopyresampled(
+				$base,
+				$overlay,
+				0,
+				0,
+				0,
+				0,
+				imagesx($base),
+				imagesy($base),
+				imagesx($overlay),
+				imagesy($overlay),
+			);
+		}
 
 
 		$fileName =  FilenameCore::randomized("jpg", "snap_");

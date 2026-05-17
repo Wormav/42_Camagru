@@ -49,10 +49,13 @@ class PostController
 
 		$submittedId = is_string($_POST["overlay_id"] ?? null) ? $_POST["overlay_id"] : "";
 		$overlays    = require __DIR__ . "/../../config/overlays.php";
-		if (!isset($overlays[$submittedId])) {
-			JsonCore::error(400, "Unknown overlay.");
+		$overlay     = null;
+		if ($submittedId !== "") {
+			if (!isset($overlays[$submittedId])) {
+				JsonCore::error(400, "Unknown overlay.");
+			}
+			$overlay = $overlays[$submittedId];
 		}
-		$overlay = $overlays[$submittedId];
 
 		$file = $_FILES["snap"] ?? null;
 		if (!is_array($file)) {
@@ -64,7 +67,7 @@ class PostController
 			JsonCore::error(400, $validationError);
 		}
 
-		$overlayAbsPath = __DIR__ . "/../../public" . $overlay["path"];
+		$overlayAbsPath = $overlay !== null ? __DIR__ . "/../.." . $overlay["path"] : null;
 
 		$composer = new ImageComposerService();
 		$fileName = $composer->merge($file["tmp_name"], $overlayAbsPath, self::SNAPS_DIR);
@@ -75,12 +78,12 @@ class PostController
 		$publicPath = self::SNAPS_PUBLIC_PREFIX . $fileName;
 		$dbConfig = require __DIR__ . "/../../config/database.php";
 		$pdo = (new DatabaseCore($dbConfig))->connection();
-		$imageId = (new ImageModel($pdo))->create((int) AuthCore::id(), $publicPath, $overlay["id"]);
+		$imageId = (new ImageModel($pdo))->create((int) AuthCore::id(), $publicPath, $overlay["id"] ?? null);
 
 		JsonCore::success([
 			"image_id"   => $imageId,
 			"image_path" => $publicPath,
-			"overlay_id" => $overlay["id"],
+			"overlay_id" => $overlay["id"] ?? null,
 		]);
 	}
 
@@ -112,7 +115,7 @@ class PostController
 			JsonCore::error(403, "Forbidden.");
 		}
 
-		$absPath = __DIR__ . "/../../public" . $image["image_path"];
+		$absPath = __DIR__ . "/../.." . $image["image_path"];
 		if (is_file($absPath) && !@unlink($absPath)) {
 			JsonCore::error(500, "Could not delete file.");
 		}

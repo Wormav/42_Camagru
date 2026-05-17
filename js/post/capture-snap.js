@@ -2,7 +2,7 @@ window.Camagru.post.captureSnap = async () => {
 	const captureBtn = document.querySelector("[data-action='capture']");
 	const selectedOverlayId = window.Camagru.post.state.selectedOverlayId;
 
-	if (selectedOverlayId === null || !(captureBtn instanceof HTMLButtonElement)) {
+	if (!(captureBtn instanceof HTMLButtonElement)) {
 		return;
 	}
 
@@ -18,7 +18,9 @@ window.Camagru.post.captureSnap = async () => {
 
 		const formData = new FormData();
 		formData.append("csrf_token", window.Camagru.shared.getCsrfToken());
-		formData.append("overlay_id", selectedOverlayId);
+		if (selectedOverlayId !== null) {
+			formData.append("overlay_id", selectedOverlayId);
+		}
 		formData.append("snap", blob, "snap.jpg");
 
 		const { response, payload } = await window.Camagru.shared.postForm("/post/capture", formData);
