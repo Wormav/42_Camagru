@@ -7,6 +7,10 @@
  *  - $e        : escape helper
  *  - $item     : array shape matching ImageModel::findFeed row
  *  - $isAuth   : bool
+ *
+ * @var \Closure(mixed): string $e
+ * @var array{id: int, user_id: int, image_path: string, overlay_used: ?string, created_at: string, username: string, avatar_path: ?string, like_count: int, comment_count: int, user_has_liked: int} $item
+ * @var bool $isAuth
  */
 
 $createdTs    = strtotime((string) $item["created_at"]);

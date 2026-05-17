@@ -117,8 +117,6 @@ fake:
 
 # Dev helpers
 install:
-	@printf "$(MAGENTA)▼ Installing PHP dependencies$(RESET) $(DIM)(composer)$(RESET)\n"
-	@composer install
 	@printf "$(MAGENTA)▼ Installing Node dependencies$(RESET) $(DIM)(npm)$(RESET)\n"
 	@npm install
 	@printf "$(GREEN)✓ Dependencies installed$(RESET)\n"
@@ -148,14 +146,6 @@ js:
 		printf "  $(GREEN)✓$(RESET) $$out\n"; \
 	done
 
-fmt:
-	@printf "$(MAGENTA)▼ Formatting PHP$(RESET) $(DIM)(php-cs-fixer, PSR-12)$(RESET)\n"
-	@vendor/bin/php-cs-fixer fix
-	@printf "$(GREEN)✓ Formatted$(RESET)\n"
-
-lint:
-	@printf "$(MAGENTA)▼ Static analysis$(RESET) $(DIM)(phpstan)$(RESET)\n"
-	@vendor/bin/phpstan analyse
 
 help: banner
 	@printf "$(BOLD)Available targets$(RESET)\n\n"
@@ -177,8 +167,6 @@ help: banner
 	@printf "    $(GREEN)tailwind$(RESET)        $(DIM)Build minified public/style.css$(RESET)\n"
 	@printf "    $(GREEN)tailwind-watch$(RESET)  $(DIM)Watch and rebuild CSS on change$(RESET)\n"
 	@printf "    $(GREEN)js$(RESET)              $(DIM)Concat js/<bundle>/*.js into public/dist/<bundle>.bundle.js$(RESET)\n"
-	@printf "    $(GREEN)fmt$(RESET)             $(DIM)Format PHP (PSR-12)$(RESET)\n"
-	@printf "    $(GREEN)lint$(RESET)            $(DIM)Run PHPStan static analysis$(RESET)\n\n"
 	@printf "    $(GREEN)help$(RESET)            $(DIM)Show this help$(RESET)\n\n"
 
-.PHONY: all banner build clean fclean re logs ps shell db fake install serve tailwind tailwind-watch js fmt lint help
+.PHONY: all banner build clean fclean re logs ps shell db fake install serve tailwind tailwind-watch js help
