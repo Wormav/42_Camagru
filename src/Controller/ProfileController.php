@@ -15,7 +15,7 @@ use App\View\View;
 
 class ProfileController
 {
-	private const AVATAR_DIR           = __DIR__ . "/../../public/uploads/avatars";
+	private const AVATAR_DIR           = __DIR__ . "/../../uploads/avatars";
 	private const AVATAR_PUBLIC_PREFIX = "/uploads/avatars/";
 
 	private const AVATAR_MIME_TO_EXT = [

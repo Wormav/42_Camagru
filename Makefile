@@ -74,7 +74,7 @@ fclean:
 	@printf "  $(DIM)→ this WIPES the database, removes custom images and user uploads$(RESET)\n"
 	@$(COMPOSE) down -v --rmi local
 	@printf "$(YELLOW)▼ Wiping user uploads$(RESET) $(DIM)(keeps .gitkeep)$(RESET)\n"
-	@find public/uploads/avatars public/uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
+	@find uploads/avatars uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
 	@printf "$(GREEN)✓ Clean slate$(RESET)\n"
 
 re: fclean build all
@@ -102,10 +102,10 @@ fake:
 	fi
 	@printf "$(MAGENTA)▼ Restoring fake data$(RESET)\n"
 	@printf "  $(DIM)→ wiping current uploads (keeps .gitkeep)$(RESET)\n"
-	@find public/uploads/avatars public/uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
-	@printf "  $(DIM)→ copying fake/avatars + fake/snaps → public/uploads/$(RESET)\n"
-	@find fake/avatars -mindepth 1 -type f -exec cp -p {} public/uploads/avatars/ \;
-	@find fake/snaps   -mindepth 1 -type f -exec cp -p {} public/uploads/snaps/   \;
+	@find uploads/avatars uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
+	@printf "  $(DIM)→ copying fake/avatars + fake/snaps → uploads/$(RESET)\n"
+	@find fake/avatars -mindepth 1 -type f -exec cp -p {} uploads/avatars/ \;
+	@find fake/snaps   -mindepth 1 -type f -exec cp -p {} uploads/snaps/   \;
 	@printf "  $(DIM)→ truncating tables and replaying fake/seed.sql$(RESET)\n"
 	@$(COMPOSE) cp fake/seed.sql $(DB):/tmp/fake-seed.sql >/dev/null
 	@$(COMPOSE) exec -T $(DB) sh -c 'mysql -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" -e "\
@@ -117,13 +117,13 @@ fake:
 
 serve:
 	@printf "$(CYAN)→ PHP dev server on $(BOLD)http://localhost:8000$(RESET)$(DIM) (Ctrl+C to stop)$(RESET)\n"
-	@php -S localhost:8000 -t public/ public/index.php
+	@php -S localhost:8000 index.php
 
 js:
 	@printf "$(CYAN)→ Building JS bundles$(RESET) $(DIM)(concat js/shared + js/<bundle>)$(RESET)\n"
-	@mkdir -p public/dist
+	@mkdir -p dist
 	@for bundle in $(JS_BUNDLES); do \
-		out=public/dist/$$bundle.bundle.js; \
+		out=dist/$$bundle.bundle.js; \
 		: > $$out; \
 		for src in js/shared/*.js js/$$bundle/*.js; do \
 			[ -f "$$src" ] && cat "$$src" >> $$out && printf "\n" >> $$out; \
@@ -148,7 +148,7 @@ help: banner
 	@printf "    $(GREEN)fake$(RESET)            $(DIM)Restore the demo dataset shipped in fake/$(RESET)\n\n"
 	@printf "  $(BOLD)App$(RESET)\n"
 	@printf "    $(GREEN)serve$(RESET)           $(DIM)Run PHP built-in server on :8000 (non-docker dev)$(RESET)\n"
-	@printf "    $(GREEN)js$(RESET)              $(DIM)Concat js/<bundle>/*.js into public/dist/<bundle>.bundle.js$(RESET)\n"
+	@printf "    $(GREEN)js$(RESET)              $(DIM)Concat js/<bundle>/*.js into dist/<bundle>.bundle.js$(RESET)\n"
 	@printf "    $(GREEN)help$(RESET)            $(DIM)Show this help$(RESET)\n\n"
 
 .PHONY: all banner build clean fclean re logs ps shell db fake serve js help

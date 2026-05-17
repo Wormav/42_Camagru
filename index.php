@@ -9,7 +9,7 @@ if (PHP_SAPI === "cli-server") {
 	}
 }
 
-require __DIR__ . "/../autoload.php";
+require __DIR__ . "/autoload.php";
 
 use App\Controller\AuthController;
 use App\Controller\CommentController;
@@ -23,7 +23,7 @@ use App\Core\RouterCore;
 use App\Core\SecurityHeadersCore;
 use App\Core\SessionCore;
 
-EnvCore::load(__DIR__ . "/../.env");
+EnvCore::load(__DIR__ . "/.env");
 
 $appEnv = EnvCore::get("APP_ENV", "production");
 error_reporting(E_ALL);

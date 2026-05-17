@@ -15,7 +15,7 @@ use App\View\View;
 
 class PostController
 {
-	private const SNAPS_DIR           = __DIR__ . "/../../public/uploads/snaps";
+	private const SNAPS_DIR           = __DIR__ . "/../../uploads/snaps";
 	private const SNAPS_PUBLIC_PREFIX = "/uploads/snaps/";
 
 	public function showPost(): void
