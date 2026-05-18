@@ -24,6 +24,10 @@ window.Camagru.post.loadUpload = (file) => {
 			window.Camagru.post.showSource("image");
 			window.Camagru.post.updateCaptureButton();
 		}, { once: true });
+		imageEl.addEventListener("error", () => {
+			window.Camagru.shared.dispatchToast("Invalid image file — please upload a real JPEG or PNG.", "error");
+			window.Camagru.post.showStatus("denied", "// invalid image file");
+		}, { once: true });
 		imageEl.src = dataUrl;
 	});
 
