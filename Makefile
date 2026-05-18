@@ -77,6 +77,12 @@ fclean:
 	@find uploads/avatars uploads/snaps -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null || true
 	@printf "$(GREEN)✓ Clean slate$(RESET)\n"
 
+prune: fclean
+	@printf "$(YELLOW)▼ Pruning all Docker containers and images$(RESET)\n"
+	@docker container prune -f >/dev/null
+	@docker image prune -a -f >/dev/null
+	@printf "$(GREEN)✓ Docker cleaned$(RESET)\n"
+
 re: fclean build all
 
 # Dev helpers — Docker
@@ -115,10 +121,6 @@ fake:
 		mysql -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" < /tmp/fake-seed.sql' 2>&1 | grep -v "Warning" || true
 	@printf "$(GREEN)✓ Fake data restored$(RESET)  $(DIM)(see fake/README.md for credentials)$(RESET)\n"
 
-serve:
-	@printf "$(CYAN)→ PHP dev server on $(BOLD)http://localhost:8000$(RESET)$(DIM) (Ctrl+C to stop)$(RESET)\n"
-	@php -S localhost:8000 index.php
-
 js:
 	@printf "$(CYAN)→ Building JS bundles$(RESET) $(DIM)(concat js/shared + js/<bundle>)$(RESET)\n"
 	@mkdir -p dist
@@ -139,16 +141,13 @@ help: banner
 	@printf "    $(GREEN)build$(RESET)           $(DIM)Rebuild custom images$(RESET)\n"
 	@printf "    $(GREEN)clean$(RESET)           $(DIM)Stop containers, keep volumes$(RESET)\n"
 	@printf "    $(GREEN)fclean$(RESET)          $(DIM)Stop, drop volumes AND remove local images$(RESET)\n"
-	@printf "    $(GREEN)re$(RESET)              $(DIM)fclean + build + all$(RESET)\n\n"
+	@printf "    $(GREEN)re$(RESET)              $(DIM)fclean + build + all$(RESET)\n"
+	@printf "    $(GREEN)prune$(RESET)           $(DIM)fclean + remove all Docker containers & images$(RESET)\n\n"
 	@printf "  $(BOLD)Docker$(RESET)\n"
 	@printf "    $(GREEN)logs$(RESET)            $(DIM)Tail container logs (db + app + web)$(RESET)\n"
 	@printf "    $(GREEN)ps$(RESET)              $(DIM)Show container status$(RESET)\n"
-	@printf "    $(GREEN)shell$(RESET)           $(DIM)Open a shell inside the PHP (app) container$(RESET)\n"
 	@printf "    $(GREEN)db$(RESET)              $(DIM)Open a MySQL shell inside the db container$(RESET)\n"
 	@printf "    $(GREEN)fake$(RESET)            $(DIM)Restore the demo dataset shipped in fake/$(RESET)\n\n"
-	@printf "  $(BOLD)App$(RESET)\n"
-	@printf "    $(GREEN)serve$(RESET)           $(DIM)Run PHP built-in server on :8000 (non-docker dev)$(RESET)\n"
-	@printf "    $(GREEN)js$(RESET)              $(DIM)Concat js/<bundle>/*.js into dist/<bundle>.bundle.js$(RESET)\n"
 	@printf "    $(GREEN)help$(RESET)            $(DIM)Show this help$(RESET)\n\n"
 
-.PHONY: all banner build clean fclean re logs ps shell db fake serve js help
+.PHONY: all banner build clean fclean prune re logs ps shell db fake js help
